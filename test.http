@@ -1,0 +1,4 @@
+GET http://localhost:8080/api/attendance/session/1/1
+
+###
+GET http://localhost:8080/api/attendance/class/1/1
