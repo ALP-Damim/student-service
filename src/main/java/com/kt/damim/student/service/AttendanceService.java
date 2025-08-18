@@ -42,12 +42,7 @@ public class AttendanceService {
         // 학생의 출석 기록 조회
         List<Attendance> attendances = attendanceRepository.findByStudentIdAndClassId(studentId, classId);
         
-        // 응답 DTO 생성
-        ClassAttendanceResponseDto response = new ClassAttendanceResponseDto();
-        response.setStudentId(studentId);
-        response.setStudentName(student.getName());
-        response.setClassId(classId);
-        response.setClassName(classEntity.getName());
+        // 응답 DTO는 attendanceResults 계산 후 생성
         
         // 각 세션별 출석 결과 생성
         List<AttendanceResultDto> attendanceResults = sessions.stream()
@@ -62,22 +57,26 @@ public class AttendanceService {
                         return AttendanceResultDto.from(attendance);
                     } else {
                         // 출석 기록이 없는 경우 기본값으로 생성
-                        AttendanceResultDto dto = new AttendanceResultDto();
-                        dto.setSessionId(session.getId());
-                        dto.setSessionTitle(session.getTitle());
-                        dto.setSessionStartTime(session.getStartTime());
-                        dto.setSessionEndTime(session.getEndTime());
-                        dto.setStatus(Attendance.AttendanceStatus.ABSENT);
-                        dto.setScore(0);
-                        dto.setComments("출석 기록 없음");
-                        return dto;
+                        return AttendanceResultDto.createDefault(
+                                session.getId(),
+                                session.getTitle(),
+                                session.getStartTime(),
+                                session.getEndTime()
+                        );
                     }
                 })
                 .collect(Collectors.toList());
         
-        response.setAttendanceResults(attendanceResults);
+        ClassAttendanceResponseDto response = ClassAttendanceResponseDto.builder()
+                .studentId(studentId)
+                .studentName(student.getName())
+                .classId(classId)
+                .className(classEntity.getName())
+                .attendanceResults(attendanceResults)
+                .build();
+
         response.calculateStatistics();
-        
+
         return response;
     }
     
@@ -93,27 +92,33 @@ public class AttendanceService {
         Attendance attendance = attendanceRepository.findByStudentIdAndSessionId(studentId, sessionId)
                 .orElse(null);
         
-        // 응답 DTO 생성
-        SessionAttendanceResponseDto response = new SessionAttendanceResponseDto();
-        response.setStudentId(studentId);
-        response.setStudentName(student.getName());
-        response.setSessionId(sessionId);
-        response.setSessionTitle(session.getTitle());
-        response.setClassName(session.getClassEntity().getName());
+        // 응답 DTO (빌더) 생성 - attendanceResult 포함하여 생성
+        SessionAttendanceResponseDto response;
         
         if (attendance != null) {
-            response.setAttendanceResult(AttendanceResultDto.from(attendance));
+            response = SessionAttendanceResponseDto.builder()
+                    .studentId(studentId)
+                    .studentName(student.getName())
+                    .sessionId(sessionId)
+                    .sessionTitle(session.getTitle())
+                    .className(session.getClassEntity().getName())
+                    .attendanceResult(AttendanceResultDto.from(attendance))
+                    .build();
         } else {
             // 출석 기록이 없는 경우 기본값으로 생성
-            AttendanceResultDto dto = new AttendanceResultDto();
-            dto.setSessionId(session.getId());
-            dto.setSessionTitle(session.getTitle());
-            dto.setSessionStartTime(session.getStartTime());
-            dto.setSessionEndTime(session.getEndTime());
-            dto.setStatus(Attendance.AttendanceStatus.ABSENT);
-            dto.setScore(0);
-            dto.setComments("출석 기록 없음");
-            response.setAttendanceResult(dto);
+            response = SessionAttendanceResponseDto.builder()
+                    .studentId(studentId)
+                    .studentName(student.getName())
+                    .sessionId(sessionId)
+                    .sessionTitle(session.getTitle())
+                    .className(session.getClassEntity().getName())
+                    .attendanceResult(AttendanceResultDto.createDefault(
+                            session.getId(),
+                            session.getTitle(),
+                            session.getStartTime(),
+                            session.getEndTime()
+                    ))
+                    .build();
         }
         
         return response;
