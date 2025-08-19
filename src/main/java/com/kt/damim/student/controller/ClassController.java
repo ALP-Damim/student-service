@@ -22,10 +22,11 @@ public class ClassController {
 	public ResponseEntity<List<ClassResponseDto>> getClasses(
 			@RequestParam(required = false) Integer limit,
 			@RequestParam(required = false, name = "semesterOrder") String semesterOrder,
-			@RequestParam(required = false, name = "day") Integer day
+			@RequestParam(required = false, name = "day") Integer day,
+			@RequestParam(required = false, name = "startId") Integer startId
 	) {
-		if (semesterOrder != null || day != null) {
-			return ResponseEntity.ok(classQueryService.getClassesWithFilter(limit, semesterOrder, day));
+		if (semesterOrder != null || day != null || startId != null) {
+			return ResponseEntity.ok(classQueryService.getClassesWithFilter(limit, semesterOrder, day, startId));
 		}
 		return ResponseEntity.ok(classQueryService.getClasses(limit));
 	}

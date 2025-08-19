@@ -27,13 +27,17 @@ public class ClassQueryService {
 		return classes.stream().map(this::toDto).collect(Collectors.toList());
 	}
 
-	public List<ClassResponseDto> getClassesWithFilter(Integer limit, String semesterOrder, Integer day) {
+	public List<ClassResponseDto> getClassesWithFilter(Integer limit, String semesterOrder, Integer day, Integer startId) {
 		List<Class> classes;
-		if (semesterOrder != null && !semesterOrder.isBlank()) {
+		if (startId != null) {
+			// 시작 ID가 지정되면 번호 순 정렬을 우선 적용
+			classes = classRepository.findAll(Sort.by(Sort.Direction.ASC, "classId"));
+		} else if (semesterOrder != null && !semesterOrder.isBlank()) {
 			Sort.Direction direction = "desc".equalsIgnoreCase(semesterOrder) ? Sort.Direction.DESC : Sort.Direction.ASC;
 			classes = classRepository.findAll(Sort.by(direction, "semester"));
 		} else {
-			classes = classRepository.findAll();
+			// 기본 정렬: 번호 오름차순
+			classes = classRepository.findAll(Sort.by(Sort.Direction.ASC, "classId"));
 		}
 
 
@@ -42,6 +46,14 @@ public class ClassQueryService {
 			int mask = day;
 			classes = classes.stream()
 					.filter(c -> c != null && c.getHeldDay() != null && (c.getHeldDay() & mask) != 0)
+					.collect(Collectors.toList());
+		}
+
+		// startId 이상만 반환 (포함)
+		if (startId != null) {
+			int from = startId;
+			classes = classes.stream()
+					.filter(c -> c != null && c.getClassId() != null && c.getClassId() >= from)
 					.collect(Collectors.toList());
 		}
 

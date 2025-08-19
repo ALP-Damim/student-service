@@ -232,6 +232,7 @@ data.generation.attendance-rate=0.7
 - `limit` (옵션): 최대 반환 개수. 생략 시 전체
 - `semesterOrder` (옵션): `asc` 또는 `desc` (학기 정렬)
 - `day` (옵션): 요일 비트마스크(1~127). 월:1, 화:2, 수:4, 목:8, 금:16, 토:32, 일:64. 합으로 여러 요일 지정
+- `startId` (옵션): 시작 ID 기준으로 `classId >= startId`인 데이터부터 반환
 
 **요청 예시**:
 ```bash
@@ -240,6 +241,7 @@ curl -X GET "http://localhost:8080/api/classes?limit=10"
 curl -X GET "http://localhost:8080/api/classes?semesterOrder=desc&limit=5"
 curl -X GET "http://localhost:8080/api/classes?day=24"                 # 목+금
 curl -X GET "http://localhost:8080/api/classes?day=31&semesterOrder=asc" # 평일 정렬
+curl -X GET "http://localhost:8080/api/classes?startId=50&limit=10"     # ID 50 이상 10개
 ```
 
 **응답 예시**:

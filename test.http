@@ -37,11 +37,14 @@ GET http://localhost:9090/api/classes?day=24
 ### 평일(월~금=31) + 학기 내림차순 + 10개 제한
 GET http://localhost:9090/api/classes?day=31&semesterOrder=desc&limit=10
 
+### 시작 ID 기준으로 조회 (포함)
+GET http://localhost:9090/api/classes?startId=45&limit=10
+
 ### 수강중 강좌 목록 (학생별)
-GET http://localhost:9090/api/students/1/classes
+GET http://localhost:9090/api/students/11/classes
 
 ### 수강중 강좌 목록 (가까운 3개)
-GET http://localhost:9090/api/students/1/classes?nearestOnly=true
+GET http://localhost:9090/api/students/11/classes?nearestOnly=true
 
 ### 수강중 강좌 목록 (특정 학기)
-GET http://localhost:9090/api/students/1/classes?semester=2024-1
+GET http://localhost:9090/api/students/11/classes?semester=2024-1
