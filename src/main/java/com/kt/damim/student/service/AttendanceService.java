@@ -65,7 +65,7 @@ public class AttendanceService {
                 .studentId(studentId)
                 .studentName(student.getEmail()) // User 엔티티에는 name이 없으므로 email 사용
                 .classId(classId)
-                .className(classEntity.getSemester()) // Class 엔티티에는 name이 없으므로 semester 사용
+                .className(classEntity.getClassName())
                 .attendanceResults(attendanceResults)
                 .averageScore(0.0)
                 .totalSessions(0L)
@@ -103,7 +103,7 @@ public class AttendanceService {
                     .studentName(student.getEmail()) // User 엔티티에는 name이 없으므로 email 사용
                     .sessionId(sessionId)
                     .sessionTitle("Session") // Session 엔티티에는 title이 없으므로 기본값 사용
-                    .className(classEntity != null ? classEntity.getSemester() : "Unknown")
+                    .className(classEntity != null ? classEntity.getClassName() : "Unknown")
                     .attendanceResult(AttendanceResultDto.from(attendance, session))
                     .build();
         } else {
@@ -113,7 +113,7 @@ public class AttendanceService {
                     .studentName(student.getEmail()) // User 엔티티에는 name이 없으므로 email 사용
                     .sessionId(sessionId)
                     .sessionTitle("Session") // Session 엔티티에는 title이 없으므로 기본값 사용
-                    .className(classEntity != null ? classEntity.getSemester() : "Unknown")
+                    .className(classEntity != null ? classEntity.getClassName() : "Unknown")
                     .attendanceResult(AttendanceResultDto.createDefault(
                             session.getSessionId(),
                             session.getOnDate()

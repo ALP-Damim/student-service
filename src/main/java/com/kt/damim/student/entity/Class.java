@@ -31,6 +31,9 @@ public class Class {
     
     @Column(name = "teacher_name", nullable = false)
     private String teacherName;
+
+    @Column(name = "class_name", nullable = false)
+    private String className;
     
     @Column(nullable = false)
     private String semester;

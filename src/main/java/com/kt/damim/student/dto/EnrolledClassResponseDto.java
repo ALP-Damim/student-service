@@ -16,6 +16,7 @@ public class EnrolledClassResponseDto {
 	private Integer classId;
 	private Integer teacherId;
 	private String teacherName;
+	private String className;
 	private String semester;
 	private String zoomUrl;
 	private Integer heldDay;

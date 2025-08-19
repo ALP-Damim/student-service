@@ -112,6 +112,7 @@ public class EnrollmentQueryService {
 				.classId(c.getClassId())
 				.teacherId(c.getTeacherId())
 				.teacherName(c.getTeacherName())
+				.className(c.getClassName())
 				.semester(c.getSemester())
 				.zoomUrl(c.getZoomUrl())
 				.heldDay(c.getHeldDay())
