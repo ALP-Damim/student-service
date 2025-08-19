@@ -1,12 +1,12 @@
 # 학생 출석 통계 서비스
 
-학생의 학습 현황 및 성적 통계를 제공하는 Spring Boot 기반 REST API 서비스입니다.
+학생의 학습 현황 및 출석 통계를 제공하는 Spring Boot 기반 REST API 서비스입니다.
 
 ## 🚀 기능
 
 - **클래스별 출석 통계**: 특정 학생의 특정 클래스에 대한 모든 세션 출석 현황 및 통계
 - **세션별 출석 조회**: 특정 학생의 특정 세션에 대한 출석 정보 조회
-- **자동 통계 계산**: 평균 점수, 출석률, 총 세션 수 등 자동 계산
+- **자동 통계 계산**: 출석률, 총 세션 수 등 자동 계산
 
 ## 🛠 기술 스택
 
@@ -20,33 +20,44 @@
 
 ### 테이블 구조
 
-1. **student**: 학생 정보
-   - id (PK)
-   - name
+1. **users**: 사용자 정보 (학생/교사)
+   - user_id (PK, Auto Increment)
    - email
-   - student_number
+   - password_hash
+   - role (STUDENT, TEACHER)
+   - is_active
+   - created_at
+   - updated_at
 
-2. **class**: 강좌 정보
-   - id (PK)
-   - name
-   - description
+2. **classes**: 강좌 정보
+   - class_id (PK, Auto Increment)
+   - teacher_id (FK to users)
+   - teacher_name
+   - semester
+   - zoom_url
+   - starts_at
+   - ends_at
+   - capacity
+   - created_at
+   - updated_at
 
-3. **session**: 강좌별 세션 정보
-   - id (PK)
-   - title
-   - description
-   - start_time
-   - end_time
-   - class_id (FK)
+3. **sessions**: 강좌별 세션 정보
+   - session_id (PK, Auto Increment)
+   - class_id (FK to classes)
+   - on_date
 
-4. **attendance**: 출석 정보
-   - id (PK)
-   - student_id (FK)
-   - session_id (FK)
+4. **enrollments**: 수강 신청 정보
+   - student_id (PK, FK to users)
+   - class_id (PK, FK to classes)
+   - status
+   - created_at
+
+5. **attendance**: 출석 정보
+   - session_id (PK, FK to sessions)
+   - student_id (PK, FK to users)
    - status (PRESENT, ABSENT, LATE, EXCUSED)
-   - score
-   - comments
-   - recorded_at
+   - note
+   - created_at
 
 ## 🔧 설정
 
@@ -147,7 +158,7 @@ gradlew.bat bootRun
 java -jar build/libs/student-service-0.0.1-SNAPSHOT.jar
 ```
 
-### 2. 테스트 실행
+### 3. 테스트 실행
 
 **Windows:**
 ```bash
@@ -159,14 +170,28 @@ gradlew.bat test
 ./gradlew test
 ```
 
-### 3. 테스트 데이터 자동 생성
+### 4. 테스트 데이터 자동 생성
 
 애플리케이션 실행 시 `DataInitializer`가 자동으로 테스트 데이터를 생성합니다:
 
-- **학생**: 김철수, 이영희
-- **클래스**: 자바 프로그래밍, 스프링 부트
+- **학생**: kim@example.com, lee@example.com
+- **교사**: teacher@example.com
+- **클래스**: 2024-1 학기 클래스들
 - **세션**: 각 클래스별 세션들
-- **출석 데이터**: 다양한 출석 상태와 점수
+- **출석 데이터**: 다양한 출석 상태
+
+콘솔에서 생성된 ID를 확인할 수 있습니다:
+```
+테스트 데이터가 성공적으로 생성되었습니다.
+학생1: 1
+학생2: 2
+교사1: 3
+클래스1: 4
+클래스2: 5
+세션1: 6
+세션2: 7
+세션3: 8
+```
 
 ## 📚 API 사용법
 
@@ -178,39 +203,35 @@ gradlew.bat test
 
 **요청 예시**:
 ```bash
-curl -X GET "http://localhost:8080/api/attendance/class/1/1"
+curl -X GET "http://localhost:8080/api/attendance/class/1/4"
 ```
 
 **응답 예시**:
 ```json
 {
   "studentId": 1,
-  "studentName": "김철수",
-  "classId": 1,
-  "className": "자바 프로그래밍",
+  "studentName": "kim@example.com",
+  "classId": 4,
+  "className": "2024-1",
   "attendanceResults": [
     {
-      "sessionId": 1,
-      "sessionTitle": "자바 기초 1강",
-      "sessionStartTime": "2024-01-15T10:00:00",
-      "sessionEndTime": "2024-01-15T12:00:00",
+      "sessionId": 6,
+      "sessionTitle": "Session",
+      "sessionOnDate": "2024-01-15T10:00:00Z",
       "status": "PRESENT",
-      "score": 85,
-      "comments": "좋은 수업이었습니다",
-      "recordedAt": "2024-01-15T10:05:00"
+      "note": "좋은 수업이었습니다",
+      "recordedAt": "2024-01-15T10:05:00Z"
     },
     {
-      "sessionId": 2,
-      "sessionTitle": "자바 기초 2강",
-      "sessionStartTime": "2024-01-17T10:00:00",
-      "sessionEndTime": "2024-01-17T12:00:00",
+      "sessionId": 7,
+      "sessionTitle": "Session",
+      "sessionOnDate": "2024-01-17T10:00:00Z",
       "status": "LATE",
-      "score": 70,
-      "comments": "지각했습니다",
-      "recordedAt": "2024-01-17T10:15:00"
+      "note": "지각했습니다",
+      "recordedAt": "2024-01-17T10:15:00Z"
     }
   ],
-  "averageScore": 77.5,
+  "averageScore": 0.0,
   "totalSessions": 2,
   "attendedSessions": 1,
   "attendanceRate": 50.0
@@ -225,26 +246,24 @@ curl -X GET "http://localhost:8080/api/attendance/class/1/1"
 
 **요청 예시**:
 ```bash
-curl -X GET "http://localhost:8080/api/attendance/session/1/1"
+curl -X GET "http://localhost:8080/api/attendance/session/1/6"
 ```
 
 **응답 예시**:
 ```json
 {
   "studentId": 1,
-  "studentName": "김철수",
-  "sessionId": 1,
-  "sessionTitle": "자바 기초 1강",
-  "className": "자바 프로그래밍",
+  "studentName": "kim@example.com",
+  "sessionId": 6,
+  "sessionTitle": "Session",
+  "className": "2024-1",
   "attendanceResult": {
-    "sessionId": 1,
-    "sessionTitle": "자바 기초 1강",
-    "sessionStartTime": "2024-01-15T10:00:00",
-    "sessionEndTime": "2024-01-15T12:00:00",
+    "sessionId": 6,
+    "sessionTitle": "Session",
+    "sessionOnDate": "2024-01-15T10:00:00Z",
     "status": "PRESENT",
-    "score": 85,
-    "comments": "좋은 수업이었습니다",
-    "recordedAt": "2024-01-15T10:05:00"
+    "note": "좋은 수업이었습니다",
+    "recordedAt": "2024-01-15T10:05:00Z"
   }
 }
 ```
@@ -267,10 +286,11 @@ curl -X GET "http://localhost:8080/api/attendance/session/1/1"
 - 애플리케이션 시작 시 자동 실행
 - 기존 데이터가 있으면 생성하지 않음
 - 다음 테스트 데이터를 생성:
-  - 2명의 학생 (김철수, 이영희)
-  - 2개의 클래스 (자바 프로그래밍, 스프링 부트)
+  - 2명의 학생 (kim@example.com, lee@example.com)
+  - 1명의 교사 (teacher@example.com)
+  - 2개의 클래스 (2024-1 학기)
   - 3개의 세션 (각 클래스별)
-  - 4개의 출석 기록 (다양한 상태와 점수)
+  - 4개의 출석 기록 (다양한 상태)
 
 ### 비활성화 방법
 테스트 데이터 생성을 원하지 않는다면 `@Component` 어노테이션을 주석 처리하거나 클래스를 삭제하세요.
@@ -315,3 +335,4 @@ API는 다음과 같은 에러 상황을 처리합니다:
 - 성적 분석 및 리포트
 - 출석 데이터 수정/삭제 기능
 - 대시보드 API
+- 사용자 인증 및 권한 관리
