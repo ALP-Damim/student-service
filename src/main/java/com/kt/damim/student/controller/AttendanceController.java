@@ -16,8 +16,8 @@ public class AttendanceController {
     
     @GetMapping("/class/{studentId}/{classId}")
     public ResponseEntity<ClassAttendanceResponseDto> getClassAttendance(
-            @PathVariable Long studentId,
-            @PathVariable Long classId) {
+            @PathVariable Integer studentId,
+            @PathVariable Integer classId) {
         
         ClassAttendanceResponseDto response = attendanceService.getClassAttendance(studentId, classId);
         return ResponseEntity.ok(response);
@@ -25,8 +25,8 @@ public class AttendanceController {
     
     @GetMapping("/session/{studentId}/{sessionId}")
     public ResponseEntity<SessionAttendanceResponseDto> getSessionAttendance(
-            @PathVariable Long studentId,
-            @PathVariable Long sessionId) {
+            @PathVariable Integer studentId,
+            @PathVariable Integer sessionId) {
         
         SessionAttendanceResponseDto response = attendanceService.getSessionAttendance(studentId, sessionId);
         return ResponseEntity.ok(response);

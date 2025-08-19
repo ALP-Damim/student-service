@@ -12,38 +12,33 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "classes")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Class {
+public class User {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "class_id")
-    private Integer classId;
-    
-    @Column(name = "teacher_id")
-    private Integer teacherId;
-    
-    @Column(name = "teacher_name", nullable = false)
-    private String teacherName;
+    @Column(name = "user_id")
+    private Integer userId;
     
     @Column(nullable = false)
-    private String semester;
+    private String email;
     
-    @Column(name = "zoom_url")
-    private String zoomUrl;
+    @Column(name = "password_hash")
+    private String passwordHash;
     
-    @Column(name = "starts_at")
-    private OffsetDateTime startsAt;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private UserRole role = UserRole.STUDENT;
     
-    @Column(name = "ends_at")
-    private OffsetDateTime endsAt;
-    
-    private Integer capacity;
+    @Column(name = "is_active", nullable = false)
+    @Builder.Default
+    private Boolean isActive = true;
     
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
@@ -52,4 +47,8 @@ public class Class {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
+    
+    public enum UserRole {
+        STUDENT, TEACHER
+    }
 }

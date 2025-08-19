@@ -1,16 +1,20 @@
 package com.kt.damim.student.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class ClassAttendanceResponseDto {
-	private Long studentId;
+	private Integer studentId;
 	private String studentName;
-	private Long classId;
+	private Integer classId;
 	private String className;
 	private List<AttendanceResultDto> attendanceResults;
 	private Double averageScore;
@@ -34,10 +38,7 @@ public class ClassAttendanceResponseDto {
 
 		this.attendanceRate = totalSessions > 0 ? (double) attendedSessions / totalSessions * 100 : 0.0;
 
-		this.averageScore = attendanceResults.stream()
-			.filter(result -> result.getScore() != null)
-			.mapToInt(AttendanceResultDto::getScore)
-			.average()
-			.orElse(0.0);
+		// score 필드가 제거되었으므로 평균 점수 계산 로직 제거
+		this.averageScore = 0.0;
 	}
 }

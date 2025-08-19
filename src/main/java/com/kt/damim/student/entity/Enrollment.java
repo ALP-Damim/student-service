@@ -11,59 +11,53 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "attendance")
+@Table(name = "enrollments")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@IdClass(Attendance.AttendanceId.class)
-public class Attendance {
-    
-    @Id
-    @Column(name = "session_id")
-    private Integer sessionId;
+@IdClass(Enrollment.EnrollmentId.class)
+public class Enrollment {
     
     @Id
     @Column(name = "student_id")
     private Integer studentId;
     
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private AttendanceStatus status;
+    @Id
+    @Column(name = "class_id")
+    private Integer classId;
     
-    private String note;
+    @Column(nullable = false)
+    @Builder.Default
+    private String status = "ENROLLED";
     
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt;  
+    private OffsetDateTime createdAt;
     
-    public enum AttendanceStatus {
-        PRESENT, ABSENT, LATE, EXCUSED
-    }
-    
-    public static class AttendanceId implements java.io.Serializable {
-        private Integer sessionId;
+    public static class EnrollmentId implements java.io.Serializable {
         private Integer studentId;
+        private Integer classId;
         
-        public AttendanceId() {}
+        public EnrollmentId() {}
         
-        public AttendanceId(Integer sessionId, Integer studentId) {
-            this.sessionId = sessionId;
+        public EnrollmentId(Integer studentId, Integer classId) {
             this.studentId = studentId;
+            this.classId = classId;
         }
         
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            AttendanceId that = (AttendanceId) o;
-            return sessionId.equals(that.sessionId) && studentId.equals(that.studentId);
+            EnrollmentId that = (EnrollmentId) o;
+            return studentId.equals(that.studentId) && classId.equals(that.classId);
         }
         
         @Override
         public int hashCode() {
-            return java.util.Objects.hash(sessionId, studentId);
+            return java.util.Objects.hash(studentId, classId);
         }
     }
 }

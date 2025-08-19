@@ -1,14 +1,18 @@
 package com.kt.damim.student.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class SessionAttendanceResponseDto {
-	private Long studentId;
+	private Integer studentId;
 	private String studentName;
-	private Long sessionId;
+	private Integer sessionId;
 	private String sessionTitle;
 	private String className;
 	private AttendanceResultDto attendanceResult;

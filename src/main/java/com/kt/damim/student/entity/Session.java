@@ -1,40 +1,32 @@
 package com.kt.damim.student.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "session")
+@Table(name = "sessions")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Session {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "session_id")
+    private Integer sessionId;
     
-    @Column(nullable = false)
-    private String title;
+    @Column(name = "class_id")
+    private Integer classId;
     
-    private String description;
+    @Column(name = "on_date")
+    private OffsetDateTime onDate;
     
-    @Column(nullable = false)
-    private LocalDateTime startTime;
-    
-    @Column(nullable = false)
-    private LocalDateTime endTime;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_id", nullable = false)
-    private Class classEntity;
-    
-    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Attendance> attendances = new ArrayList<>();
 }
