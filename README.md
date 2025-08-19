@@ -284,7 +284,7 @@ curl -X GET "http://localhost:8080/api/attendance/class/1/1"
   "attendanceResults": [
     {
       "sessionId": 1,
-      "sessionTitle": "Session",
+      "sessionName": "session1",
       "sessionOnDate": "2024-01-15T10:00:00Z",
       "status": "PRESENT",
       "note": "좋은 수업이었습니다",
@@ -292,7 +292,7 @@ curl -X GET "http://localhost:8080/api/attendance/class/1/1"
     },
     {
       "sessionId": 2,
-      "sessionTitle": "Session",
+      "sessionName": "session2",
       "sessionOnDate": "2024-01-17T10:00:00Z",
       "status": "LATE",
       "note": "지각했습니다",
@@ -323,11 +323,11 @@ curl -X GET "http://localhost:8080/api/attendance/session/1/1"
   "studentId": 1,
   "studentName": "kim@example.com",
   "sessionId": 1,
-  "sessionTitle": "Session",
+  "sessionName": "session1",
   "className": "2024-1",
   "attendanceResult": {
     "sessionId": 1,
-    "sessionTitle": "Session",
+    "sessionName": "session1",
     "sessionOnDate": "2024-01-15T10:00:00Z",
     "status": "PRESENT",
     "note": "좋은 수업이었습니다",

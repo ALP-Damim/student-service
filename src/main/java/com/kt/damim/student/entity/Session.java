@@ -26,6 +26,9 @@ public class Session {
     @Column(name = "class_id")
     private Integer classId;
     
+    @Column(name = "session_name", nullable = false)
+    private String sessionName;
+
     @Column(name = "on_date")
     private OffsetDateTime onDate;
     

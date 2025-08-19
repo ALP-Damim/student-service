@@ -102,7 +102,7 @@ public class AttendanceService {
                     .studentId(studentId)
                     .studentName(student.getEmail()) // User 엔티티에는 name이 없으므로 email 사용
                     .sessionId(sessionId)
-                    .sessionTitle("Session") // Session 엔티티에는 title이 없으므로 기본값 사용
+                    .sessionName(session.getSessionName())
                     .className(classEntity != null ? classEntity.getClassName() : "Unknown")
                     .attendanceResult(AttendanceResultDto.from(attendance, session))
                     .build();
@@ -112,7 +112,7 @@ public class AttendanceService {
                     .studentId(studentId)
                     .studentName(student.getEmail()) // User 엔티티에는 name이 없으므로 email 사용
                     .sessionId(sessionId)
-                    .sessionTitle("Session") // Session 엔티티에는 title이 없으므로 기본값 사용
+                    .sessionName(session.getSessionName())
                     .className(classEntity != null ? classEntity.getClassName() : "Unknown")
                     .attendanceResult(AttendanceResultDto.createDefault(
                             session.getSessionId(),

@@ -197,6 +197,7 @@ public class DataGenerator implements CommandLineRunner {
                 
                 Session session = Session.builder()
                         .classId(classEntity.getClassId())
+                        .sessionName("session" + (i + 1))
                         .onDate(sessionDate)
                         .build();
                 

@@ -15,7 +15,7 @@ import java.time.OffsetDateTime;
 @Builder
 public class AttendanceResultDto {
 	private Integer sessionId;
-	private String sessionTitle;
+	private String sessionName;
 	private OffsetDateTime sessionOnDate;
 	private Attendance.AttendanceStatus status;
 	private String note;
@@ -24,7 +24,7 @@ public class AttendanceResultDto {
 	public static AttendanceResultDto from(Attendance attendance, Session session) {
 		return AttendanceResultDto.builder()
 			.sessionId(attendance.getSessionId())
-			.sessionTitle("Session") // Session 엔티티에는 title이 없으므로 기본값 사용
+			.sessionName(session != null ? session.getSessionName() : null)
 			.sessionOnDate(session != null ? session.getOnDate() : null)
 			.status(attendance.getStatus())
 			.note(attendance.getNote())
@@ -35,7 +35,7 @@ public class AttendanceResultDto {
 	public static AttendanceResultDto from(Attendance attendance) {
 		return AttendanceResultDto.builder()
 			.sessionId(attendance.getSessionId())
-			.sessionTitle("Session") // Session 엔티티에는 title이 없으므로 기본값 사용
+			.sessionName(null)
 			.sessionOnDate(null) // 세션 정보는 별도로 조회해야 함
 			.status(attendance.getStatus())
 			.note(attendance.getNote())
@@ -46,7 +46,7 @@ public class AttendanceResultDto {
 	public static AttendanceResultDto createDefault(Integer sessionId, OffsetDateTime onDate) {
 		return AttendanceResultDto.builder()
 			.sessionId(sessionId)
-			.sessionTitle("Session")
+			.sessionName("Session")
 			.sessionOnDate(onDate)
 			.status(Attendance.AttendanceStatus.ABSENT)
 			.note("출석 기록 없음")

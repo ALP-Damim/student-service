@@ -13,7 +13,7 @@ public class SessionAttendanceResponseDto {
 	private Integer studentId;
 	private String studentName;
 	private Integer sessionId;
-	private String sessionTitle;
+	private String sessionName;
 	private String className;
 	private AttendanceResultDto attendanceResult;
 }

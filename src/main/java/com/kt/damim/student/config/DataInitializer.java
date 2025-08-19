@@ -101,18 +101,21 @@ public class DataInitializer implements CommandLineRunner {
 		// 세션 데이터 생성
 		Session session1 = Session.builder()
 				.classId(class1.getClassId())
+				.sessionName("session1")
 				.onDate(OffsetDateTime.now().minusDays(7))
 				.build();
 		session1 = sessionRepository.save(session1);
 		
 		Session session2 = Session.builder()
 				.classId(class1.getClassId())
+				.sessionName("session2")
 				.onDate(OffsetDateTime.now().minusDays(5))
 				.build();
 		session2 = sessionRepository.save(session2);
 		
 		Session session3 = Session.builder()
 				.classId(class2.getClassId())
+				.sessionName("session3")
 				.onDate(OffsetDateTime.now().minusDays(3))
 				.build();
 		session3 = sessionRepository.save(session3);
