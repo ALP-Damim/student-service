@@ -42,10 +42,11 @@ public class ClassQueryService {
 
 
 		// day 파라미터를 요일 비트마스크(1~127)로 해석하여 필터링
+
 		if (day != null && day >= 1 && day <= 127) {
 			int mask = day;
 			classes = classes.stream()
-					.filter(c -> c != null && c.getHeldDay() != null && (c.getHeldDay() & mask) != 0)
+					.filter(c -> c != null && c.getHeldDay() != null && (c.getHeldDay() & mask) == mask)
 					.collect(Collectors.toList());
 		}
 
