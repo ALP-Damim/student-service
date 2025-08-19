@@ -222,7 +222,45 @@ data.generation.attendance-rate=0.7
 
 ## 📚 API 사용법
 
-### 1. 클래스별 출석 통계 조회
+### 1. 모든 강좌 조회 (RESTful)
+
+**엔드포인트**: `GET /api/classes`
+
+**설명**: 모든 강좌를 조회합니다. 쿼리 파라미터로 개수 제한, 학기 정렬, 요일 비트마스크 필터를 지원합니다.
+
+**쿼리 파라미터**:
+- `limit` (옵션): 최대 반환 개수. 생략 시 전체
+- `semesterOrder` (옵션): `asc` 또는 `desc` (학기 정렬)
+- `day` (옵션): 요일 비트마스크(1~127). 월:1, 화:2, 수:4, 목:8, 금:16, 토:32, 일:64. 합으로 여러 요일 지정
+
+**요청 예시**:
+```bash
+curl -X GET "http://localhost:8080/api/classes"
+curl -X GET "http://localhost:8080/api/classes?limit=10"
+curl -X GET "http://localhost:8080/api/classes?semesterOrder=desc&limit=5"
+curl -X GET "http://localhost:8080/api/classes?day=24"                 # 목+금
+curl -X GET "http://localhost:8080/api/classes?day=31&semesterOrder=asc" # 평일 정렬
+```
+
+**응답 예시**:
+```json
+[
+  {
+    "classId": 1,
+    "teacherId": 101,
+    "teacherName": "김교수",
+    "className": "자바프로그래밍",
+    "semester": "2024-1",
+    "zoomUrl": "https://zoom.us/j/123456789",
+    "heldDay": 7,
+    "heldDaysString": "월, 화, 수",
+    "startsAt": "10:00:00",
+    "endsAt": "12:00:00"
+  }
+]
+```
+
+### 2. 클래스별 출석 통계 조회
 
 **엔드포인트**: `GET /api/attendance/class/{studentId}/{classId}`
 
@@ -265,7 +303,7 @@ curl -X GET "http://localhost:8080/api/attendance/class/1/1"
 }
 ```
 
-### 2. 세션별 출석 조회
+### 3. 세션별 출석 조회
 
 **엔드포인트**: `GET /api/attendance/session/{studentId}/{sessionId}`
 
