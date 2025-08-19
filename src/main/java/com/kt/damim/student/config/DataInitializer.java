@@ -10,9 +10,11 @@ import com.kt.damim.student.repository.SessionRepository;
 import com.kt.damim.student.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -20,6 +22,7 @@ import jakarta.persistence.PersistenceContext;
 @Component
 @RequiredArgsConstructor
 @Profile("!test")
+@ConditionalOnProperty(name = "data.generation.enabled", havingValue = "false", matchIfMissing = true)
 public class DataInitializer implements CommandLineRunner {
 	
 	private final UserRepository userRepository;
@@ -72,8 +75,9 @@ public class DataInitializer implements CommandLineRunner {
 				.teacherName("김교수")
 				.semester("2024-1")
 				.zoomUrl("https://zoom.us/j/123456789")
-				.startsAt(OffsetDateTime.now().minusDays(30))
-				.endsAt(OffsetDateTime.now().plusDays(90))
+				.heldDay(7) // 월화수 (1+2+4)
+				.startsAt(LocalTime.of(10, 0)) // 10:00
+				.endsAt(LocalTime.of(12, 0)) // 12:00
 				.capacity(30)
 				.createdAt(OffsetDateTime.now())
 				.build();
@@ -84,8 +88,9 @@ public class DataInitializer implements CommandLineRunner {
 				.teacherName("김교수")
 				.semester("2024-1")
 				.zoomUrl("https://zoom.us/j/987654321")
-				.startsAt(OffsetDateTime.now().minusDays(30))
-				.endsAt(OffsetDateTime.now().plusDays(90))
+				.heldDay(24) // 목금 (8+16)
+				.startsAt(LocalTime.of(14, 0)) // 14:00
+				.endsAt(LocalTime.of(16, 0)) // 16:00
 				.capacity(25)
 				.createdAt(OffsetDateTime.now())
 				.build();
@@ -151,8 +156,8 @@ public class DataInitializer implements CommandLineRunner {
 		System.out.println("학생1: " + student1.getUserId());
 		System.out.println("학생2: " + student2.getUserId());
 		System.out.println("교사1: " + teacher1.getUserId());
-		System.out.println("클래스1: " + class1.getClassId());
-		System.out.println("클래스2: " + class2.getClassId());
+		System.out.println("클래스1: " + class1.getClassId() + " (요일: " + class1.getHeldDaysString() + ", 시간: " + class1.getStartsAt() + "-" + class1.getEndsAt() + ")");
+		System.out.println("클래스2: " + class2.getClassId() + " (요일: " + class2.getHeldDaysString() + ", 시간: " + class2.getStartsAt() + "-" + class2.getEndsAt() + ")");
 		System.out.println("세션1: " + session1.getSessionId());
 		System.out.println("세션2: " + session2.getSessionId());
 		System.out.println("세션3: " + session3.getSessionId());

@@ -32,14 +32,15 @@
 2. **classes**: 강좌 정보
    - class_id (PK, Auto Increment)
    - teacher_id (FK to users)
-   - teacher_name
-   - semester
-   - zoom_url
-   - starts_at
-   - ends_at
-   - capacity
-   - created_at
-   - updated_at
+   - teacher_name (TEXT, NOT NULL)
+   - semester (TEXT, NOT NULL)
+   - zoom_url (TEXT)
+   - held_day (INTEGER) - 비트셋으로 요일 표시 (월:1, 화:2, 수:4, 목:8, 금:16, 토:32, 일:64)
+   - starts_at (TIME) - HH:MM 형식
+   - ends_at (TIME) - HH:MM 형식
+   - capacity (INTEGER)
+   - created_at (TIMESTAMPTZ, NOT NULL)
+   - updated_at (TIMESTAMPTZ, NOT NULL)
 
 3. **sessions**: 강좌별 세션 정보
    - session_id (PK, Auto Increment)
@@ -170,27 +171,53 @@ gradlew.bat test
 ./gradlew test
 ```
 
-### 4. 테스트 데이터 자동 생성
+### 4. 테스트 데이터 생성
 
-애플리케이션 실행 시 `DataInitializer`가 자동으로 테스트 데이터를 생성합니다:
+애플리케이션은 두 가지 방식으로 테스트 데이터를 생성할 수 있습니다:
 
+#### A. 기본 테스트 데이터 (기본값)
+- **DataInitializer**가 자동으로 실행됩니다
 - **학생**: kim@example.com, lee@example.com
 - **교사**: teacher@example.com
-- **클래스**: 2024-1 학기 클래스들
+- **클래스**: 2024-1 학기 클래스들 (요일 및 시간 정보 포함)
 - **세션**: 각 클래스별 세션들
 - **출석 데이터**: 다양한 출석 상태
 
-콘솔에서 생성된 ID를 확인할 수 있습니다:
+#### B. 대량 테스트 데이터 생성
+`application.properties`에서 다음 설정을 활성화하세요:
+
+```properties
+# 대량 데이터 생성 활성화
+data.generation.enabled=true
+
+# 데이터 생성 설정 (기본값)
+data.generation.teacher-count=10
+data.generation.student-count=100
+data.generation.class-per-teacher=5
+data.generation.enrollment-per-student=5
+data.generation.session-per-class=10
+data.generation.attendance-rate=0.7
 ```
-테스트 데이터가 성공적으로 생성되었습니다.
-학생1: 1
-학생2: 2
-교사1: 3
-클래스1: 4
-클래스2: 5
-세션1: 6
-세션2: 7
-세션3: 8
+
+**생성되는 데이터:**
+- **교사**: 10명 (teacher1@university.edu ~ teacher10@university.edu)
+- **학생**: 100명 (student1@university.edu ~ student100@university.edu)
+- **클래스**: 50개 (교사당 5개씩)
+- **세션**: 500개 (클래스당 10개씩)
+- **수강신청**: 500개 (학생당 5개씩)
+- **출석기록**: 약 3,500개 (70% 출석률 기준)
+
+**콘솔에서 생성된 ID를 확인할 수 있습니다:**
+```
+=== 데이터 생성 통계 ===
+교사: 10명
+학생: 100명
+클래스: 50개
+세션: 500개
+수강신청: 500개
+출석기록: 3500개
+평균 출석률: 70.0%
+=====================
 ```
 
 ## 📚 API 사용법
@@ -203,7 +230,7 @@ gradlew.bat test
 
 **요청 예시**:
 ```bash
-curl -X GET "http://localhost:8080/api/attendance/class/1/4"
+curl -X GET "http://localhost:8080/api/attendance/class/1/1"
 ```
 
 **응답 예시**:
@@ -211,11 +238,11 @@ curl -X GET "http://localhost:8080/api/attendance/class/1/4"
 {
   "studentId": 1,
   "studentName": "kim@example.com",
-  "classId": 4,
+  "classId": 1,
   "className": "2024-1",
   "attendanceResults": [
     {
-      "sessionId": 6,
+      "sessionId": 1,
       "sessionTitle": "Session",
       "sessionOnDate": "2024-01-15T10:00:00Z",
       "status": "PRESENT",
@@ -223,7 +250,7 @@ curl -X GET "http://localhost:8080/api/attendance/class/1/4"
       "recordedAt": "2024-01-15T10:05:00Z"
     },
     {
-      "sessionId": 7,
+      "sessionId": 2,
       "sessionTitle": "Session",
       "sessionOnDate": "2024-01-17T10:00:00Z",
       "status": "LATE",
@@ -246,7 +273,7 @@ curl -X GET "http://localhost:8080/api/attendance/class/1/4"
 
 **요청 예시**:
 ```bash
-curl -X GET "http://localhost:8080/api/attendance/session/1/6"
+curl -X GET "http://localhost:8080/api/attendance/session/1/1"
 ```
 
 **응답 예시**:
@@ -254,11 +281,11 @@ curl -X GET "http://localhost:8080/api/attendance/session/1/6"
 {
   "studentId": 1,
   "studentName": "kim@example.com",
-  "sessionId": 6,
+  "sessionId": 1,
   "sessionTitle": "Session",
   "className": "2024-1",
   "attendanceResult": {
-    "sessionId": 6,
+    "sessionId": 1,
     "sessionTitle": "Session",
     "sessionOnDate": "2024-01-15T10:00:00Z",
     "status": "PRESENT",
@@ -275,32 +302,42 @@ curl -X GET "http://localhost:8080/api/attendance/session/1/6"
 - **LATE**: 지각
 - **EXCUSED**: 사유 결석
 
-## 🔧 DataInitializer
+## 🔧 데이터 생성 시스템
 
-`DataInitializer` 클래스는 애플리케이션 시작 시 자동으로 테스트 데이터를 생성합니다.
+### DataInitializer (기본 테스트 데이터)
+- **위치**: `src/main/java/com/kt/damim/student/config/DataInitializer.java`
+- **활성화 조건**: `data.generation.enabled=false` (기본값)
+- **기능**: 소량의 기본 테스트 데이터 생성
 
-### 위치
-`src/main/java/com/kt/damim/student/config/DataInitializer.java`
+### DataGenerator (대량 테스트 데이터)
+- **위치**: `src/main/java/com/kt/damim/student/data/DataGenerator.java`
+- **활성화 조건**: `data.generation.enabled=true`
+- **기능**: 대량의 테스트 데이터 생성
 
-### 기능
-- 애플리케이션 시작 시 자동 실행
-- 기존 데이터가 있으면 생성하지 않음
-- 다음 테스트 데이터를 생성:
-  - 2명의 학생 (kim@example.com, lee@example.com)
-  - 1명의 교사 (teacher@example.com)
-  - 2개의 클래스 (2024-1 학기)
-  - 3개의 세션 (각 클래스별)
-  - 4개의 출석 기록 (다양한 상태)
+### DataGenerationConfig (설정 관리)
+- **위치**: `src/main/java/com/kt/damim/student/config/DataGenerationConfig.java`
+- **기능**: 데이터 생성 관련 설정 관리
 
-### 비활성화 방법
-테스트 데이터 생성을 원하지 않는다면 `@Component` 어노테이션을 주석 처리하거나 클래스를 삭제하세요.
+### 설정 옵션
+```properties
+# 데이터 생성 활성화
+data.generation.enabled=true
+
+# 생성할 데이터 양 설정
+data.generation.teacher-count=10          # 교사 수
+data.generation.student-count=100         # 학생 수
+data.generation.class-per-teacher=5       # 교사당 클래스 수
+data.generation.enrollment-per-student=5  # 학생당 수강 과목 수
+data.generation.session-per-class=10      # 클래스당 세션 수
+data.generation.attendance-rate=0.7       # 출석률 (0.0 ~ 1.0)
+```
 
 ## 🧪 테스트 환경
 
 ### 테스트 설정
 - **데이터베이스**: H2 인메모리 데이터베이스 사용
 - **프로파일**: `test` 프로파일 활성화
-- **DataInitializer**: 테스트 환경에서는 비활성화됨
+- **DataInitializer/DataGenerator**: 테스트 환경에서는 비활성화됨
 
 ### 테스트 파일 위치
 - `src/test/resources/application.properties`: 테스트용 설정
@@ -336,3 +373,4 @@ API는 다음과 같은 에러 상황을 처리합니다:
 - 출석 데이터 수정/삭제 기능
 - 대시보드 API
 - 사용자 인증 및 권한 관리
+- 클래스 일정 관리 API
