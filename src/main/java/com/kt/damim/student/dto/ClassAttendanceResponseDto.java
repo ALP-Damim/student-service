@@ -1,5 +1,6 @@
 package com.kt.damim.student.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,15 +12,33 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "클래스별 출석 통계 응답 DTO")
 public class ClassAttendanceResponseDto {
+	@Schema(description = "학생 ID", example = "1")
 	private Integer studentId;
+	
+	@Schema(description = "학생 이름", example = "kim@example.com")
 	private String studentName;
+	
+	@Schema(description = "클래스 ID", example = "1")
 	private Integer classId;
+	
+	@Schema(description = "클래스명", example = "2024-1")
 	private String className;
+	
+	@Schema(description = "출석 결과 목록")
 	private List<AttendanceResultDto> attendanceResults;
+	
+	@Schema(description = "평균 점수", example = "0.0")
 	private Double averageScore;
+	
+	@Schema(description = "총 세션 수", example = "2")
 	private Long totalSessions;
+	
+	@Schema(description = "출석한 세션 수", example = "1")
 	private Long attendedSessions;
+	
+	@Schema(description = "출석률", example = "50.0")
 	private Double attendanceRate;
 
 	public void calculateStatistics() {
