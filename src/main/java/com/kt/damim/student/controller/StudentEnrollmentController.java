@@ -23,11 +23,7 @@ public class StudentEnrollmentController {
 	public ResponseEntity<List<EnrolledClassResponseDto>> getEnrolledClasses(
 			@PathVariable Integer studentId,
 			@RequestParam(required = false) String semester,
-			@RequestParam(required = false) Boolean active,
-			@RequestParam(required = false, defaultValue = "false") boolean nearestOnly) {
-		if (nearestOnly) {
-			return ResponseEntity.ok(enrollmentQueryService.getNearestThree(studentId));
-		}
+			@RequestParam(required = false) Boolean active) {
 		return ResponseEntity.ok(enrollmentQueryService.getEnrolledClasses(studentId, semester, active));
 	}
 }

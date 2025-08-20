@@ -58,8 +58,7 @@ GET http://localhost:8080/api/classes?teacherId=1&semesterOrder=desc&day=31&limi
 ### 수강중 강좌 목록 (학생별)
 GET http://localhost:8080/api/students/11/classes
 
-### 수강중 강좌 목록 (가까운 3개)
-GET http://localhost:8080/api/students/11/classes?nearestOnly=true
+
 
 ### 수강중 강좌 목록 (특정 학기)
 GET http://localhost:8080/api/students/11/classes?semester=2024-1
