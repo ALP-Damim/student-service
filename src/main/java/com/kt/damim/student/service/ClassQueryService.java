@@ -17,27 +17,43 @@ public class ClassQueryService {
 
 	private final ClassRepository classRepository;
 
-	public List<ClassResponseDto> getClasses(Integer limit) {
+	public List<ClassResponseDto> getClasses(Integer limit, Integer teacherId) {
 		List<Class> classes;
-		if (limit != null && limit > 0) {
-			classes = classRepository.findAll(PageRequest.of(0, limit)).getContent();
+		if (teacherId != null) {
+			classes = classRepository.findByTeacherId(teacherId);
 		} else {
-			classes = classRepository.findAll();
+			if (limit != null && limit > 0) {
+				classes = classRepository.findAll(PageRequest.of(0, limit)).getContent();
+			} else {
+				classes = classRepository.findAll();
+			}
 		}
+		
+		// teacherId가 지정된 경우에도 limit 적용
+		if (teacherId != null && limit != null && limit > 0 && classes.size() > limit) {
+			classes = classes.subList(0, limit);
+		}
+		
 		return classes.stream().map(this::toDto).collect(Collectors.toList());
 	}
 
-	public List<ClassResponseDto> getClassesWithFilter(Integer limit, String semesterOrder, Integer day, Integer startId) {
+	public List<ClassResponseDto> getClassesWithFilter(Integer limit, String semesterOrder, Integer day, Integer startId, Integer teacherId) {
 		List<Class> classes;
-		if (startId != null) {
-			// 시작 ID가 지정되면 번호 순 정렬을 우선 적용
-			classes = classRepository.findAll(Sort.by(Sort.Direction.ASC, "classId"));
-		} else if (semesterOrder != null && !semesterOrder.isBlank()) {
-			Sort.Direction direction = "desc".equalsIgnoreCase(semesterOrder) ? Sort.Direction.DESC : Sort.Direction.ASC;
-			classes = classRepository.findAll(Sort.by(direction, "semester"));
+		
+		// teacherId가 지정된 경우 해당 교사의 수업만 조회
+		if (teacherId != null) {
+			classes = classRepository.findByTeacherId(teacherId);
 		} else {
-			// 기본 정렬: 번호 오름차순
-			classes = classRepository.findAll(Sort.by(Sort.Direction.ASC, "classId"));
+			if (startId != null) {
+				// 시작 ID가 지정되면 번호 순 정렬을 우선 적용
+				classes = classRepository.findAll(Sort.by(Sort.Direction.ASC, "classId"));
+			} else if (semesterOrder != null && !semesterOrder.isBlank()) {
+				Sort.Direction direction = "desc".equalsIgnoreCase(semesterOrder) ? Sort.Direction.DESC : Sort.Direction.ASC;
+				classes = classRepository.findAll(Sort.by(direction, "semester"));
+			} else {
+				// 기본 정렬: 번호 오름차순
+				classes = classRepository.findAll(Sort.by(Sort.Direction.ASC, "classId"));
+			}
 		}
 
 

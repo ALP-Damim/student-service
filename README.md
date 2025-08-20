@@ -234,6 +234,7 @@ data.generation.attendance-rate=0.7
 - `day` (옵션): 요일 비트마스크(1~127). 월:1, 화:2, 수:4, 목:8, 금:16, 토:32, 일:64. 합으로 여러 요일 지정
   - AND 방식: 지정한 모든 요일을 포함하는 강좌만 반환합니다. 예) `day=3`(월+화)은 월/화 모두 포함된 강좌만 매칭
 - `startId` (옵션): 시작 ID 기준으로 `classId >= startId`인 데이터부터 반환
+- `teacherId` (옵션): 특정 교사가 담당하는 강좌만 필터링
 
 **요청 예시**:
 ```bash
@@ -243,6 +244,11 @@ curl -X GET "http://localhost:8080/api/classes?semesterOrder=desc&limit=5"
 curl -X GET "http://localhost:8080/api/classes?day=24"                 # 목+금
 curl -X GET "http://localhost:8080/api/classes?day=31&semesterOrder=asc" # 평일 정렬
 curl -X GET "http://localhost:8080/api/classes?startId=50&limit=10"     # ID 50 이상 10개
+curl -X GET "http://localhost:8080/api/classes?teacherId=1"            # 교사 ID 1의 강좌만
+curl -X GET "http://localhost:8080/api/classes?teacherId=1&limit=5"    # 교사 ID 1의 강좌 5개만
+curl -X GET "http://localhost:8080/api/classes?teacherId=1&semesterOrder=desc" # 교사별 + 학기 내림차순
+curl -X GET "http://localhost:8080/api/classes?teacherId=1&day=7"      # 교사별 + 월화수 요일
+curl -X GET "http://localhost:8080/api/classes?teacherId=1&semesterOrder=desc&day=31&limit=10" # 복합 조건
 ```
 
 **응답 예시**:
@@ -262,6 +268,12 @@ curl -X GET "http://localhost:8080/api/classes?startId=50&limit=10"     # ID 50 
   }
 ]
 ```
+
+**teacherId 필터링 동작 방식**:
+- `teacherId`가 지정되면 해당 교사가 담당하는 강좌만 반환됩니다
+- 다른 필터 조건들(`limit`, `semesterOrder`, `day`, `startId`)과 함께 사용 가능합니다
+- `teacherId`가 지정되지 않으면 모든 교사의 강좌를 반환합니다
+- 교사 ID는 `classes` 테이블의 `teacher_id` 컬럼과 매칭됩니다
 
 ### 2. 클래스별 출석 통계 조회
 

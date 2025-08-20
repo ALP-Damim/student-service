@@ -23,12 +23,13 @@ public class ClassController {
 			@RequestParam(required = false) Integer limit,
 			@RequestParam(required = false, name = "semesterOrder") String semesterOrder,
 			@RequestParam(required = false, name = "day") Integer day,
-			@RequestParam(required = false, name = "startId") Integer startId
+			@RequestParam(required = false, name = "startId") Integer startId,
+			@RequestParam(required = false, name = "teacherId") Integer teacherId
 	) {
-		if (semesterOrder != null || day != null || startId != null) {
-			return ResponseEntity.ok(classQueryService.getClassesWithFilter(limit, semesterOrder, day, startId));
+		if (semesterOrder != null || day != null || startId != null || teacherId != null) {
+			return ResponseEntity.ok(classQueryService.getClassesWithFilter(limit, semesterOrder, day, startId, teacherId));
 		}
-		return ResponseEntity.ok(classQueryService.getClasses(limit));
+		return ResponseEntity.ok(classQueryService.getClasses(limit, teacherId));
 	}
 }
 

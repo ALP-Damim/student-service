@@ -9,42 +9,57 @@
 # 세션3: 7
 
 # 실제 ID로 변경하여 사용하세요
-GET http://localhost:9090/api/attendance/session/1/1
+GET http://localhost:8080/api/attendance/session/1/1
 
 ###
-GET http://localhost:9090/api/attendance/class/1/1
+GET http://localhost:8080/api/attendance/class/1/1
 ###
-GET http://localhost:9090/api/students/11/classes
+GET http://localhost:8080/api/students/11/classes
 
 ###
-GET http://localhost:9090/api/classes?limit=10
+GET http://localhost:8080/api/classes?limit=10
 
 ### 모든 강좌 전체 조회
-GET http://localhost:9090/api/classes
+GET http://localhost:8080/api/classes
 
 ### 모든 강좌 조회 (최대 10개)
-GET http://localhost:9090/api/classes?limit=10
+GET http://localhost:8080/api/classes?limit=10
 
 ### 학기 오름차순 정렬
-GET http://localhost:9090/api/classes?semesterOrder=asc
+GET http://localhost:8080/api/classes?semesterOrder=asc
 
 ### 학기 내림차순 정렬 + 5개 제한
-GET http://localhost:9090/api/classes?semesterOrder=desc&limit=5
+GET http://localhost:8080/api/classes?semesterOrder=desc&limit=5
 
 ### 요일 비트마스크(목/금=24)로 필터링
-GET http://localhost:9090/api/classes?day=24
+GET http://localhost:8080/api/classes?day=24
 
 ### 평일(월~금=31) + 학기 내림차순 + 10개 제한
-GET http://localhost:9090/api/classes?day=31&semesterOrder=desc&limit=10
+GET http://localhost:8080/api/classes?day=31&semesterOrder=desc&limit=10
 
 ### 시작 ID 기준으로 조회 (포함)
-GET http://localhost:9090/api/classes?startId=45&limit=10
+GET http://localhost:8080/api/classes?startId=45&limit=10
+
+### 특정 교사의 강좌만 조회
+GET http://localhost:8080/api/classes?teacherId=1
+
+### 특정 교사의 강좌 조회 (최대 5개)
+GET http://localhost:8080/api/classes?teacherId=1&limit=5
+
+### 특정 교사의 강좌 + 학기 내림차순 정렬
+GET http://localhost:8080/api/classes?teacherId=1&semesterOrder=desc
+
+### 특정 교사의 강좌 + 요일 필터링 (월화수=7)
+GET http://localhost:8080/api/classes?teacherId=1&day=7
+
+### 특정 교사의 강좌 + 복합 조건 (학기 내림차순 + 요일 필터 + 제한)
+GET http://localhost:8080/api/classes?teacherId=1&semesterOrder=desc&day=31&limit=10
 
 ### 수강중 강좌 목록 (학생별)
-GET http://localhost:9090/api/students/11/classes
+GET http://localhost:8080/api/students/11/classes
 
 ### 수강중 강좌 목록 (가까운 3개)
-GET http://localhost:9090/api/students/11/classes?nearestOnly=true
+GET http://localhost:8080/api/students/11/classes?nearestOnly=true
 
 ### 수강중 강좌 목록 (특정 학기)
-GET http://localhost:9090/api/students/11/classes?semester=2024-1
+GET http://localhost:8080/api/students/11/classes?semester=2024-1
