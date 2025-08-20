@@ -12,7 +12,7 @@ public class DataGenerationConfig {
     private int studentCount = 100;
     private int classPerTeacher = 5;
     private int enrollmentPerStudent = 5;
-    private int sessionPerClass = 10;
+    private int sessionPerClass = 20;
     private double attendanceRate = 0.7; // 70% 출석률
     
     public boolean isEnabled() {

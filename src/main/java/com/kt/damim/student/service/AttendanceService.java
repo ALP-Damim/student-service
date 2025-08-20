@@ -35,7 +35,7 @@ public class AttendanceService {
                 .orElseThrow(() -> new RuntimeException("클래스를 찾을 수 없습니다: " + classId));
         
         // 해당 클래스의 모든 세션 조회
-        List<Session> sessions = sessionRepository.findByClassId(classId);
+        List<Session> sessions = sessionRepository.findByClassIdOrderByOnDateAsc(classId);
         
         // 학생의 출석 기록 조회
         List<Attendance> attendances = attendanceRepository.findByStudentIdAndClassId(studentId, classId);

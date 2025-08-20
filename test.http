@@ -140,6 +140,9 @@ Content-Type: application/json
 
 [1, 2, 3]
 
+### 강좌별 세션 목록 조회
+GET http://localhost:8080/api/sessions/classes/1
+
 ###
 
 ### 사용자 정보 조회

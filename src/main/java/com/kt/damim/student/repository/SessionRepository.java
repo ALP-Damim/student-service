@@ -12,8 +12,8 @@ import java.util.List;
 @Repository
 public interface SessionRepository extends JpaRepository<Session, Integer> {
     
-    @Query("SELECT s FROM Session s WHERE s.classId = :classId")
-    List<Session> findByClassId(@Param("classId") Integer classId);
+    @Query("SELECT s FROM Session s WHERE s.classId = :classId ORDER BY s.onDate ASC")
+    List<Session> findByClassIdOrderByOnDateAsc(@Param("classId") Integer classId);
     
     List<Session> findByOnDateBetween(OffsetDateTime start, OffsetDateTime end);
     

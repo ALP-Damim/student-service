@@ -349,19 +349,37 @@ public class DataGenerator implements CommandLineRunner {
     
     private List<Session> generateSessions(List<Class> classes) {
         List<Session> sessions = new ArrayList<>();
+        OffsetDateTime now = OffsetDateTime.now();
         
         for (Class classEntity : classes) {
-            for (int i = 0; i < config.getSessionPerClass(); i++) {
-                // 과거 3개월에서 미래 1개월 사이의 랜덤 날짜
-                OffsetDateTime sessionDate = OffsetDateTime.now()
-                        .minusDays(90 + random.nextInt(120))
-                        .withHour(9 + random.nextInt(8)) // 9시-17시
-                        .withMinute(random.nextInt(4) * 15); // 0, 15, 30, 45분
-                
+            // 강의 요일과 시간 정보 가져오기
+            int heldDay = classEntity.getHeldDay();
+            LocalTime startTime = classEntity.getStartsAt();
+            LocalTime endTime = classEntity.getEndsAt();
+            
+            // 과거 세션 생성 (오늘 이전)
+            int pastSessionCount = config.getSessionPerClass() / 2;
+            List<OffsetDateTime> pastSessionDates = generatePastSessionDates(heldDay, startTime, now, pastSessionCount);
+            
+            for (int i = 0; i < pastSessionDates.size(); i++) {
                 Session session = Session.builder()
                         .classId(classEntity.getClassId())
                         .sessionName("session" + (i + 1))
-                        .onDate(sessionDate)
+                        .onDate(pastSessionDates.get(i))
+                        .build();
+                
+                sessions.add(sessionRepository.save(session));
+            }
+            
+            // 미래 세션 생성 (오늘 포함 이후)
+            int futureSessionCount = config.getSessionPerClass() - pastSessionCount;
+            List<OffsetDateTime> futureSessionDates = generateFutureSessionDates(heldDay, startTime, now, futureSessionCount);
+            
+            for (int i = 0; i < futureSessionDates.size(); i++) {
+                Session session = Session.builder()
+                        .classId(classEntity.getClassId())
+                        .sessionName("session" + (pastSessionDates.size() + i + 1))
+                        .onDate(futureSessionDates.get(i))
                         .build();
                 
                 sessions.add(sessionRepository.save(session));
@@ -370,6 +388,70 @@ public class DataGenerator implements CommandLineRunner {
         
         return sessions;
     }
+    
+    /**
+     * 과거 세션 날짜들 생성 (오늘 이전)
+     */
+    private List<OffsetDateTime> generatePastSessionDates(int heldDay, LocalTime startTime, OffsetDateTime now, int targetCount) {
+        List<OffsetDateTime> sessionDates = new ArrayList<>();
+        OffsetDateTime currentDate = now.minusDays(1); // 오늘 이전부터 시작
+        
+        // 과거로 가면서 강의 요일에 맞는 날짜들을 찾아서 세션 생성
+        while (sessionDates.size() < targetCount) {
+            int dayOfWeek = currentDate.getDayOfWeek().getValue(); // 1(월요일) ~ 7(일요일)
+            int dayBit = 1 << (dayOfWeek - 1); // 월(1), 화(2), 수(4), 목(8), 금(16), 토(32), 일(64)
+            
+            // 해당 요일이 강의 요일에 포함되는지 확인
+            if ((heldDay & dayBit) != 0) {
+                OffsetDateTime sessionDate = currentDate
+                        .withHour(startTime.getHour())
+                        .withMinute(startTime.getMinute())
+                        .withSecond(0)
+                        .withNano(0);
+                
+                sessionDates.add(sessionDate);
+            }
+            
+            // 이전 날짜로 이동
+            currentDate = currentDate.minusDays(1);
+        }
+        
+        return sessionDates;
+    }
+    
+    /**
+     * 미래 세션 날짜들 생성 (오늘 포함 이후)
+     */
+    private List<OffsetDateTime> generateFutureSessionDates(int heldDay, LocalTime startTime, OffsetDateTime now, int targetCount) {
+        List<OffsetDateTime> sessionDates = new ArrayList<>();
+        OffsetDateTime currentDate = now; // 오늘부터 시작
+        
+        // 미래로 가면서 강의 요일에 맞는 날짜들을 찾아서 세션 생성
+        while (sessionDates.size() < targetCount) {
+            int dayOfWeek = currentDate.getDayOfWeek().getValue(); // 1(월요일) ~ 7(일요일)
+            int dayBit = 1 << (dayOfWeek - 1); // 월(1), 화(2), 수(4), 목(8), 금(16), 토(32), 일(64)
+            
+            // 해당 요일이 강의 요일에 포함되는지 확인
+            if ((heldDay & dayBit) != 0) {
+                OffsetDateTime sessionDate = currentDate
+                        .withHour(startTime.getHour())
+                        .withMinute(startTime.getMinute())
+                        .withSecond(0)
+                        .withNano(0);
+                
+                sessionDates.add(sessionDate);
+            }
+            
+            // 다음 날짜로 이동
+            currentDate = currentDate.plusDays(1);
+        }
+        
+        return sessionDates;
+    }
+    
+
+    
+
     
     private List<Enrollment> generateEnrollments(List<User> students, List<Class> classes) {
         List<Enrollment> enrollments = new ArrayList<>();
@@ -455,26 +537,30 @@ public class DataGenerator implements CommandLineRunner {
     
     private int generateAttendances(List<User> students, List<Session> sessions) {
         int attendanceCount = 0;
+        OffsetDateTime now = OffsetDateTime.now();
         
         for (User student : students) {
             // 학생이 수강하는 클래스의 세션들만 필터링
             List<Session> studentSessions = getStudentSessions(student, sessions);
             
             for (Session session : studentSessions) {
-                // 출석률에 따라 출석 여부 결정
-                if (random.nextDouble() < config.getAttendanceRate()) {
-                    Attendance.AttendanceStatus status = getRandomAttendanceStatus();
-                    
-                    Attendance attendance = Attendance.builder()
-                            .sessionId(session.getSessionId())
-                            .studentId(student.getUserId())
-                            .status(status)
-                            .note(getRandomNote(status))
-                            .createdAt(session.getOnDate().plusMinutes(random.nextInt(30)))
-                            .build();
-                    
-                    attendanceRepository.save(attendance);
-                    attendanceCount++;
+                // 현재 시간 이전의 세션에만 출석 데이터 생성
+                if (session.getOnDate().isBefore(now)) {
+                    // 출석률에 따라 출석 여부 결정
+                    if (random.nextDouble() < config.getAttendanceRate()) {
+                        Attendance.AttendanceStatus status = getRandomAttendanceStatus();
+                        
+                        Attendance attendance = Attendance.builder()
+                                .sessionId(session.getSessionId())
+                                .studentId(student.getUserId())
+                                .status(status)
+                                .note(getRandomNote(status))
+                                .createdAt(session.getOnDate().plusMinutes(random.nextInt(30)))
+                                .build();
+                        
+                        attendanceRepository.save(attendance);
+                        attendanceCount++;
+                    }
                 }
             }
         }
