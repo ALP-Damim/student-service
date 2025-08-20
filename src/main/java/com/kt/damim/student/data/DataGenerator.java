@@ -25,6 +25,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -87,8 +88,12 @@ public class DataGenerator implements CommandLineRunner {
     
     // 요일 비트셋 (월화수목금토일)
     // 월(1), 화(2), 수(4), 목(8), 금(16), 토(32), 일(64)
-    // 월화수=7, 목금=24, 월화=3, 수목=12, 금토=48, 토일=96, 월화수목금=31, 월화수목금토=63, 월화수목금토일=127
-    private static final int[] DAY_PATTERNS = {7, 24, 3, 12, 48, 96, 31, 63, 127};
+    // 1~3개 요일 조합만 사용
+    private static final int[] DAY_PATTERNS = {
+        1, 2, 4, 8, 16, 32, 64,  // 단일 요일
+        3, 5, 6, 9, 10, 12, 17, 18, 20, 24, 33, 34, 36, 40, 48, 65, 66, 68, 72, 80, 96,  // 2개 요일
+        7, 11, 13, 14, 19, 21, 22, 25, 26, 28, 35, 37, 38, 41, 42, 44, 49, 50, 52, 56, 67, 69, 70, 73, 74, 76, 81, 82, 84, 88, 97, 98, 100, 104, 112  // 3개 요일
+    };
     
     // 시간대 패턴
     private static final LocalTime[][] TIME_PATTERNS = {
@@ -238,11 +243,22 @@ public class DataGenerator implements CommandLineRunner {
         int classIndex = 0;
         
         for (User teacher : teachers) {
+            List<Class> teacherClasses = new ArrayList<>(); // 교사별로 이미 생성된 강좌들
+            
             for (int i = 0; i < config.getClassPerTeacher(); i++) {
                 String subject = SUBJECTS[classIndex % SUBJECTS.length];
                 String semester = SEMESTERS[random.nextInt(SEMESTERS.length)];
-                int dayPattern = DAY_PATTERNS[random.nextInt(DAY_PATTERNS.length)];
-                LocalTime[] timePattern = TIME_PATTERNS[random.nextInt(TIME_PATTERNS.length)];
+                
+                // 시간 충돌이 없는 요일/시간 조합 찾기
+                ClassSchedule schedule = findNonConflictingSchedule(teacherClasses);
+                
+                if (schedule == null) {
+                    log.warn("교사 {}에게 시간 충돌이 없는 스케줄을 찾을 수 없습니다. 기본 스케줄을 사용합니다.", teacher.getUserId());
+                    // 기본 스케줄 사용
+                    int dayPattern = DAY_PATTERNS[random.nextInt(DAY_PATTERNS.length)];
+                    LocalTime[] timePattern = TIME_PATTERNS[random.nextInt(TIME_PATTERNS.length)];
+                    schedule = new ClassSchedule(dayPattern, timePattern[0], timePattern[1]);
+                }
                 
                 Class classEntity = Class.builder()
                         .teacherId(teacher.getUserId())
@@ -250,19 +266,85 @@ public class DataGenerator implements CommandLineRunner {
                         .className(subject)
                         .semester(semester)
                         .zoomUrl("https://zoom.us/j/" + (100000000 + random.nextInt(900000000)))
-                        .heldDay(dayPattern)
-                        .startsAt(timePattern[0])
-                        .endsAt(timePattern[1])
+                        .heldDay(schedule.dayPattern)
+                        .startsAt(schedule.startTime)
+                        .endsAt(schedule.endTime)
                         .capacity(20 + random.nextInt(31)) // 20-50명
                         .createdAt(OffsetDateTime.now())
                         .build();
                 
-                classes.add(classRepository.save(classEntity));
+                Class savedClass = classRepository.save(classEntity);
+                classes.add(savedClass);
+                teacherClasses.add(savedClass);
                 classIndex++;
             }
         }
         
         return classes;
+    }
+    
+    /**
+     * 시간 충돌이 없는 스케줄 찾기
+     */
+    private ClassSchedule findNonConflictingSchedule(List<Class> existingClasses) {
+        List<ClassSchedule> availableSchedules = new ArrayList<>();
+        
+        // 모든 가능한 요일/시간 조합을 확인하여 충돌이 없는 스케줄들 수집
+        for (int dayPattern : DAY_PATTERNS) {
+            for (LocalTime[] timePattern : TIME_PATTERNS) {
+                ClassSchedule candidate = new ClassSchedule(dayPattern, timePattern[0], timePattern[1]);
+                
+                boolean hasConflict = false;
+                for (Class existingClass : existingClasses) {
+                    if (hasTimeOverlap(candidate.dayPattern, candidate.startTime, candidate.endTime,
+                                     existingClass.getHeldDay(), existingClass.getStartsAt(), existingClass.getEndsAt())) {
+                        hasConflict = true;
+                        break;
+                    }
+                }
+                
+                if (!hasConflict) {
+                    availableSchedules.add(candidate);
+                }
+            }
+        }
+        
+        // 충돌이 없는 스케줄이 있으면 랜덤하게 선택
+        if (!availableSchedules.isEmpty()) {
+            int randomIndex = random.nextInt(availableSchedules.size());
+            return availableSchedules.get(randomIndex);
+        }
+        
+        return null; // 충돌이 없는 스케줄을 찾을 수 없음
+    }
+    
+    /**
+     * 두 스케줄 간의 시간 충돌 여부 확인 (오버로드된 메서드)
+     */
+    private boolean hasTimeOverlap(int day1, LocalTime start1, LocalTime end1, 
+                                 int day2, LocalTime start2, LocalTime end2) {
+        // 요일이 겹치는지 확인
+        if ((day1 & day2) == 0) {
+            return false; // 요일이 겹치지 않으면 충돌 없음
+        }
+        
+        // 시간이 겹치는지 확인
+        return start1.isBefore(end2) && start2.isBefore(end1);
+    }
+    
+    /**
+     * 강좌 스케줄을 담는 내부 클래스
+     */
+    private static class ClassSchedule {
+        final int dayPattern;
+        final LocalTime startTime;
+        final LocalTime endTime;
+        
+        ClassSchedule(int dayPattern, LocalTime startTime, LocalTime endTime) {
+            this.dayPattern = dayPattern;
+            this.startTime = startTime;
+            this.endTime = endTime;
+        }
     }
     
     private List<Session> generateSessions(List<Class> classes) {
@@ -295,13 +377,27 @@ public class DataGenerator implements CommandLineRunner {
         for (User student : students) {
             // 학생별로 랜덤하게 5개 클래스 선택
             List<Class> availableClasses = new ArrayList<>(classes);
+            List<Class> enrolledClasses = new ArrayList<>(); // 이미 신청한 강좌들
             int enrollmentCount = Math.min(config.getEnrollmentPerStudent(), availableClasses.size());
             
             for (int i = 0; i < enrollmentCount; i++) {
                 if (availableClasses.isEmpty()) break;
                 
-                int randomIndex = random.nextInt(availableClasses.size());
-                Class selectedClass = availableClasses.remove(randomIndex);
+                // 시간 충돌이 없는 강좌들만 필터링
+                List<Class> nonConflictingClasses = filterNonConflictingClasses(availableClasses, enrolledClasses);
+                
+                if (nonConflictingClasses.isEmpty()) {
+                    // 충돌이 없는 강좌가 없으면 기존 방식으로 진행
+                    log.warn("학생 {}에게 시간 충돌이 없는 강좌가 없습니다. 기존 방식으로 진행합니다.", student.getUserId());
+                    break;
+                }
+                
+                int randomIndex = random.nextInt(nonConflictingClasses.size());
+                Class selectedClass = nonConflictingClasses.get(randomIndex);
+                
+                // 선택된 강좌를 availableClasses에서 제거
+                availableClasses.remove(selectedClass);
+                enrolledClasses.add(selectedClass);
                 
                 Enrollment enrollment = Enrollment.builder()
                         .studentId(student.getUserId())
@@ -315,6 +411,46 @@ public class DataGenerator implements CommandLineRunner {
         }
         
         return enrollments;
+    }
+    
+    /**
+     * 시간 충돌이 없는 강좌들만 필터링
+     */
+    private List<Class> filterNonConflictingClasses(List<Class> availableClasses, List<Class> enrolledClasses) {
+        return availableClasses.stream()
+                .filter(availableClass -> !hasTimeConflict(availableClass, enrolledClasses))
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 특정 강좌가 이미 신청한 강좌들과 시간 충돌이 있는지 확인
+     */
+    private boolean hasTimeConflict(Class newClass, List<Class> enrolledClasses) {
+        for (Class enrolledClass : enrolledClasses) {
+            if (hasTimeOverlap(newClass, enrolledClass)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * 두 강좌 간의 시간 충돌 여부 확인
+     */
+    private boolean hasTimeOverlap(Class class1, Class class2) {
+        // 요일이 겹치는지 확인
+        if ((class1.getHeldDay() & class2.getHeldDay()) == 0) {
+            return false; // 요일이 겹치지 않으면 충돌 없음
+        }
+        
+        // 시간이 겹치는지 확인
+        LocalTime start1 = class1.getStartsAt();
+        LocalTime end1 = class1.getEndsAt();
+        LocalTime start2 = class2.getStartsAt();
+        LocalTime end2 = class2.getEndsAt();
+        
+        // 시간 겹침 확인: (start1 < end2) && (start2 < end1)
+        return start1.isBefore(end2) && start2.isBefore(end1);
     }
     
     private int generateAttendances(List<User> students, List<Session> sessions) {
