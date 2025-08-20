@@ -62,3 +62,60 @@ GET http://localhost:8080/api/students/11/classes
 
 ### 수강중 강좌 목록 (특정 학기)
 GET http://localhost:8080/api/students/11/classes?semester=2024-1
+
+### 강좌 등록
+POST http://localhost:8080/api/classes
+Content-Type: application/json
+
+{
+  "teacherId": 1,
+  "teacherName": "김교수",
+  "className": "자바 프로그래밍",
+  "semester": "2024-2",
+  "zoomUrl": "https://zoom.us/j/123456789",
+  "heldDay": 7,
+  "startsAt": "10:00:00",
+  "endsAt": "12:00:00",
+  "capacity": 30
+}
+
+### 강좌 등록 (월화수 수업)
+POST http://localhost:8080/api/classes
+Content-Type: application/json
+
+{
+  "teacherId": 2,
+  "teacherName": "이교수",
+  "className": "데이터베이스 설계",
+  "semester": "2024-2",
+  "zoomUrl": "https://zoom.us/j/987654321",
+  "heldDay": 7,
+  "startsAt": "14:00:00",
+  "endsAt": "16:00:00",
+  "capacity": 25
+}
+
+### 강좌 등록 (목금 수업)
+POST http://localhost:8080/api/classes
+Content-Type: application/json
+
+{
+  "teacherId": 3,
+  "teacherName": "박교수",
+  "className": "웹 개발 실습",
+  "semester": "2024-2",
+  "zoomUrl": "https://zoom.us/j/555666777",
+  "heldDay": 24,
+  "startsAt": "09:00:00",
+  "endsAt": "11:00:00",
+  "capacity": 20
+}
+
+### 사용자 정보 조회
+GET http://localhost:8080/api/users/1
+
+### 사용자 정보 조회 (학생)
+GET http://localhost:8080/api/users/2
+
+### 사용자 정보 조회 (교사)
+GET http://localhost:8080/api/users/3

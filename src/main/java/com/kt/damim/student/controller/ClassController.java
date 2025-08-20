@@ -1,10 +1,15 @@
 package com.kt.damim.student.controller;
 
+import com.kt.damim.student.dto.ClassCreateRequestDto;
 import com.kt.damim.student.dto.ClassResponseDto;
 import com.kt.damim.student.service.ClassQueryService;
+import com.kt.damim.student.service.ClassService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +22,7 @@ import java.util.List;
 public class ClassController {
 
 	private final ClassQueryService classQueryService;
+	private final ClassService classService;
 
 	@GetMapping
 	public ResponseEntity<List<ClassResponseDto>> getClasses(
@@ -30,6 +36,12 @@ public class ClassController {
 			return ResponseEntity.ok(classQueryService.getClassesWithFilter(limit, semesterOrder, day, startId, teacherId));
 		}
 		return ResponseEntity.ok(classQueryService.getClasses(limit, teacherId));
+	}
+
+	@PostMapping
+	public ResponseEntity<ClassResponseDto> createClass(@RequestBody ClassCreateRequestDto requestDto) {
+		ClassResponseDto createdClass = classService.createClass(requestDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(createdClass);
 	}
 }
 

@@ -222,7 +222,79 @@ data.generation.attendance-rate=0.7
 
 ## 📚 API 사용법
 
-### 1. 모든 강좌 조회 (RESTful)
+### 1. 강좌 등록
+
+**엔드포인트**: `POST /api/classes`
+
+**설명**: 새로운 강좌를 등록합니다.
+
+**요청 본문**:
+```json
+{
+  "teacherId": 1,
+  "teacherName": "김교수",
+  "className": "자바 프로그래밍",
+  "semester": "2024-2",
+  "zoomUrl": "https://zoom.us/j/123456789",
+  "heldDay": 7,
+  "startsAt": "10:00:00",
+  "endsAt": "12:00:00",
+  "capacity": 30
+}
+```
+
+**필수 필드**:
+- `teacherId`: 교사 ID (Integer)
+- `teacherName`: 교사 이름 (String)
+- `className`: 강좌명 (String)
+- `semester`: 학기 (String)
+- `heldDay`: 요일 비트마스크 (Integer, 1~127)
+- `startsAt`: 시작 시간 (HH:MM:SS 형식)
+- `endsAt`: 종료 시간 (HH:MM:SS 형식)
+
+**선택 필드**:
+- `zoomUrl`: 줌 URL (String)
+- `capacity`: 수용 인원 (Integer)
+
+**요청 예시**:
+```bash
+curl -X POST "http://localhost:8080/api/classes" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "teacherId": 1,
+    "teacherName": "김교수",
+    "className": "자바 프로그래밍",
+    "semester": "2024-2",
+    "zoomUrl": "https://zoom.us/j/123456789",
+    "heldDay": 7,
+    "startsAt": "10:00:00",
+    "endsAt": "12:00:00",
+    "capacity": 30
+  }'
+```
+
+**응답 예시** (201 Created):
+```json
+{
+  "classId": 51,
+  "teacherId": 1,
+  "teacherName": "김교수",
+  "className": "자바 프로그래밍",
+  "semester": "2024-2",
+  "zoomUrl": "https://zoom.us/j/123456789",
+  "heldDay": 7,
+  "heldDaysString": "월, 화, 수",
+  "startsAt": "10:00:00",
+  "endsAt": "12:00:00"
+}
+```
+
+**요일 비트마스크 설명**:
+- 월: 1, 화: 2, 수: 4, 목: 8, 금: 16, 토: 32, 일: 64
+- 예: 월화수 = 1 + 2 + 4 = 7
+- 예: 목금 = 8 + 16 = 24
+
+### 2. 모든 강좌 조회 (RESTful)
 
 **엔드포인트**: `GET /api/classes`
 
@@ -275,7 +347,7 @@ curl -X GET "http://localhost:8080/api/classes?teacherId=1&semesterOrder=desc&da
 - `teacherId`가 지정되지 않으면 모든 교사의 강좌를 반환합니다
 - 교사 ID는 `classes` 테이블의 `teacher_id` 컬럼과 매칭됩니다
 
-### 2. 클래스별 출석 통계 조회
+### 3. 클래스별 출석 통계 조회
 
 **엔드포인트**: `GET /api/attendance/class/{studentId}/{classId}`
 
@@ -318,7 +390,7 @@ curl -X GET "http://localhost:8080/api/attendance/class/1/1"
 }
 ```
 
-### 3. 세션별 출석 조회
+### 4. 세션별 출석 조회
 
 **엔드포인트**: `GET /api/attendance/session/{studentId}/{sessionId}`
 
@@ -347,6 +419,36 @@ curl -X GET "http://localhost:8080/api/attendance/session/1/1"
   }
 }
 ```
+
+### 5. 사용자 정보 조회
+
+**엔드포인트**: `GET /api/users/{userId}`
+
+**설명**: 특정 사용자의 정보를 조회합니다.
+
+**경로 변수**:
+- `userId`: 조회할 사용자의 ID (Integer)
+
+**요청 예시**:
+```bash
+curl -X GET "http://localhost:8080/api/users/1"
+```
+
+**응답 예시**:
+```json
+{
+  "userId": 1,
+  "email": "kim@example.com",
+  "role": "STUDENT",
+  "isActive": true,
+  "createdAt": "2024-01-15T10:00:00Z",
+  "updatedAt": "2024-01-15T10:00:00Z"
+}
+```
+
+**사용자 역할 (role)**:
+- `STUDENT`: 학생
+- `TEACHER`: 교사
 
 ## 📊 출석 상태
 
