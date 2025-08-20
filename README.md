@@ -450,6 +450,121 @@ curl -X GET "http://localhost:8080/api/users/1"
 - `STUDENT`: 학생
 - `TEACHER`: 교사
 
+### 5. 사용자 프로필 조회
+
+**엔드포인트**: `GET /api/user-profiles/{userId}`
+
+**설명**: 특정 사용자의 상세 프로필 정보를 조회합니다.
+
+**경로 변수**:
+- `userId` (Integer, required): 조회할 사용자 프로필의 ID
+
+**요청 예시**:
+```bash
+curl -X GET "http://localhost:8080/api/user-profiles/1"
+```
+
+**응답 예시**:
+```json
+{
+  "userId": 1,
+  "name": "김교수",
+  "desiredCourse": "자바프로그래밍",
+  "desiredJob": "소프트웨어 개발자",
+  "birthDate": "1985-03-15",
+  "school": "서울대학교",
+  "phone": "010-1234-5678",
+  "createdAt": "2024-01-15T10:30:00Z",
+  "updatedAt": "2024-01-15T10:30:00Z"
+}
+```
+
+**프로필 정보**:
+- `name`: 사용자 이름
+- `desiredCourse`: 희망 과목
+- `desiredJob`: 희망 직업
+- `birthDate`: 생년월일 (YYYY-MM-DD 형식)
+- `school`: 소속 학교
+- `phone`: 전화번호
+
+### 6. 사용자 프로필 수정
+
+**엔드포인트**: `PUT /api/user-profiles/{userId}`
+
+**설명**: 특정 사용자의 프로필 정보를 수정합니다. 부분 수정을 지원합니다.
+
+**경로 변수**:
+- `userId` (Integer, required): 수정할 사용자 프로필의 ID
+
+**요청 본문**:
+```json
+{
+  "name": "김교수님",
+  "desiredCourse": "스프링부트",
+  "desiredJob": "백엔드 개발자",
+  "birthDate": "1985-03-15",
+  "school": "서울대학교",
+  "phone": "010-1234-5678"
+}
+```
+
+**요청 필드** (모두 선택사항):
+- `name`: 사용자 이름 (String)
+- `desiredCourse`: 희망 과목 (String)
+- `desiredJob`: 희망 직업 (String)
+- `birthDate`: 생년월일 (YYYY-MM-DD 형식)
+- `school`: 소속 학교 (String)
+- `phone`: 전화번호 (010-XXXX-XXXX 형식)
+
+**요청 예시**:
+```bash
+# 전체 프로필 수정
+curl -X PUT "http://localhost:8080/api/user-profiles/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "김교수님",
+    "desiredCourse": "스프링부트",
+    "desiredJob": "백엔드 개발자",
+    "birthDate": "1985-03-15",
+    "school": "서울대학교",
+    "phone": "010-1234-5678"
+  }'
+
+# 부분 수정 (이름만 변경)
+curl -X PUT "http://localhost:8080/api/user-profiles/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "김교수님"
+  }'
+```
+
+**응답 예시** (200 OK):
+```json
+{
+  "userId": 1,
+  "name": "김교수님",
+  "desiredCourse": "스프링부트",
+  "desiredJob": "백엔드 개발자",
+  "birthDate": "1985-03-15",
+  "school": "서울대학교",
+  "phone": "010-1234-5678",
+  "createdAt": "2024-01-15T10:30:00Z",
+  "updatedAt": "2024-01-20T15:45:00Z"
+}
+```
+
+**데이터 검증**:
+- 이름이 비어있으면 안 됩니다
+- 생년월일은 미래 날짜일 수 없습니다
+- 전화번호는 010-XXXX-XXXX 형식이어야 합니다
+
+**에러 응답 예시** (400 Bad Request):
+```json
+{
+  "message": "전화번호는 010-XXXX-XXXX 형식이어야 합니다."
+}
+```
+
 ## 📊 출석 상태
 
 - **PRESENT**: 출석

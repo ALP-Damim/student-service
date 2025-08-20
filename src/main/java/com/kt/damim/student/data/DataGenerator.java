@@ -6,17 +6,20 @@ import com.kt.damim.student.entity.Class;
 import com.kt.damim.student.entity.Enrollment;
 import com.kt.damim.student.entity.Session;
 import com.kt.damim.student.entity.User;
+import com.kt.damim.student.entity.UserProfile;
 import com.kt.damim.student.repository.AttendanceRepository;
 import com.kt.damim.student.repository.ClassRepository;
 import com.kt.damim.student.repository.EnrollmentRepository;
 import com.kt.damim.student.repository.SessionRepository;
 import com.kt.damim.student.repository.UserRepository;
+import com.kt.damim.student.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -31,6 +34,7 @@ public class DataGenerator implements CommandLineRunner {
     
     private final DataGenerationConfig config;
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
     private final ClassRepository classRepository;
     private final SessionRepository sessionRepository;
     private final EnrollmentRepository enrollmentRepository;
@@ -42,6 +46,32 @@ public class DataGenerator implements CommandLineRunner {
     private static final String[] TEACHER_NAMES = {
         "김교수", "이교수", "박교수", "최교수", "정교수",
         "한교수", "윤교수", "임교수", "강교수", "조교수"
+    };
+    
+    // 학생 이름 목록
+    private static final String[] STUDENT_NAMES = {
+        "김학생", "이학생", "박학생", "최학생", "정학생",
+        "한학생", "윤학생", "임학생", "강학생", "조학생",
+        "서학생", "신학생", "오학생", "유학생", "장학생",
+        "전학생", "제학생", "하학생", "고학생", "문학생"
+    };
+    
+    // 학교 목록
+    private static final String[] SCHOOLS = {
+        "서울대학교", "연세대학교", "고려대학교", "성균관대학교", "한양대학교",
+        "중앙대학교", "경희대학교", "동국대학교", "홍익대학교", "건국대학교"
+    };
+    
+    // 희망 과목 목록
+    private static final String[] DESIRED_COURSES = {
+        "자바프로그래밍", "웹개발", "모바일앱개발", "데이터분석", "인공지능",
+        "게임개발", "보안", "클라우드컴퓨팅", "DevOps", "블록체인"
+    };
+    
+    // 희망 직업 목록
+    private static final String[] DESIRED_JOBS = {
+        "소프트웨어 개발자", "웹 개발자", "모바일 앱 개발자", "데이터 분석가", "AI 엔지니어",
+        "게임 개발자", "보안 전문가", "DevOps 엔지니어", "프로젝트 매니저", "IT 컨설턴트"
     };
     
     // 과목명 목록
@@ -86,13 +116,15 @@ public class DataGenerator implements CommandLineRunner {
         
         long startTime = System.currentTimeMillis();
         
-        // 1. 교사 생성
+        // 1. 교사 생성 및 프로필 생성
         List<User> teachers = generateTeachers();
-        log.info("{}명의 교사를 생성했습니다.", teachers.size());
+        generateTeacherProfiles(teachers);
+        log.info("{}명의 교사와 프로필을 생성했습니다.", teachers.size());
         
-        // 2. 학생 생성
+        // 2. 학생 생성 및 프로필 생성
         List<User> students = generateStudents();
-        log.info("{}명의 학생을 생성했습니다.", students.size());
+        generateStudentProfiles(students);
+        log.info("{}명의 학생과 프로필을 생성했습니다.", students.size());
         
         // 3. 클래스 생성
         List<Class> classes = generateClasses(teachers);
@@ -150,6 +182,55 @@ public class DataGenerator implements CommandLineRunner {
         }
         
         return students;
+    }
+    
+    private void generateTeacherProfiles(List<User> teachers) {
+        for (int i = 0; i < teachers.size(); i++) {
+            User teacher = teachers.get(i);
+            String teacherName = TEACHER_NAMES[i % TEACHER_NAMES.length];
+            
+            UserProfile profile = UserProfile.builder()
+                    .userId(teacher.getUserId())
+                    .name(teacherName)
+                    .desiredCourse(DESIRED_COURSES[random.nextInt(DESIRED_COURSES.length)])
+                    .desiredJob(DESIRED_JOBS[random.nextInt(DESIRED_JOBS.length)])
+                    .birthDate(generateRandomBirthDate(30, 60)) // 교사는 30-60세
+                    .school(SCHOOLS[random.nextInt(SCHOOLS.length)])
+                    .phone("010-" + String.format("%04d", random.nextInt(10000)) + "-" + String.format("%04d", random.nextInt(10000)))
+                    .createdAt(OffsetDateTime.now())
+                    .build();
+            
+            userProfileRepository.save(profile);
+        }
+    }
+    
+    private void generateStudentProfiles(List<User> students) {
+        for (int i = 0; i < students.size(); i++) {
+            User student = students.get(i);
+            String studentName = STUDENT_NAMES[i % STUDENT_NAMES.length];
+            
+            UserProfile profile = UserProfile.builder()
+                    .userId(student.getUserId())
+                    .name(studentName)
+                    .desiredCourse(DESIRED_COURSES[random.nextInt(DESIRED_COURSES.length)])
+                    .desiredJob(DESIRED_JOBS[random.nextInt(DESIRED_JOBS.length)])
+                    .birthDate(generateRandomBirthDate(18, 25)) // 학생은 18-25세
+                    .school(SCHOOLS[random.nextInt(SCHOOLS.length)])
+                    .phone("010-" + String.format("%04d", random.nextInt(10000)) + "-" + String.format("%04d", random.nextInt(10000)))
+                    .createdAt(OffsetDateTime.now())
+                    .build();
+            
+            userProfileRepository.save(profile);
+        }
+    }
+    
+    private LocalDate generateRandomBirthDate(int minAge, int maxAge) {
+        int currentYear = OffsetDateTime.now().getYear();
+        int birthYear = currentYear - minAge - random.nextInt(maxAge - minAge + 1);
+        int birthMonth = 1 + random.nextInt(12);
+        int birthDay = 1 + random.nextInt(28); // 간단히 28일로 제한
+        
+        return LocalDate.of(birthYear, birthMonth, birthDay);
     }
     
     private List<Class> generateClasses(List<User> teachers) {

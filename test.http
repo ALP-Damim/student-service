@@ -119,3 +119,78 @@ GET http://localhost:8080/api/users/2
 
 ### 사용자 정보 조회 (교사)
 GET http://localhost:8080/api/users/3
+
+###
+
+### 사용자 프로필 조회
+GET http://localhost:8080/api/user-profiles/1
+
+###
+
+### 사용자 프로필 조회 (학생)
+GET http://localhost:8080/api/user-profiles/2
+
+###
+
+### 사용자 프로필 조회 (교사)
+GET http://localhost:8080/api/user-profiles/3
+
+###
+
+### 존재하지 않는 사용자 프로필 조회
+GET http://localhost:8080/api/user-profiles/999
+
+###
+
+### 사용자 프로필 수정
+PUT http://localhost:8080/api/user-profiles/1
+Content-Type: application/json
+
+{
+  "name": "김교수님",
+  "desiredCourse": "스프링부트",
+  "desiredJob": "백엔드 개발자",
+  "birthDate": "1985-03-15",
+  "school": "서울대학교",
+  "phone": "010-1234-5678"
+}
+
+###
+
+### 사용자 프로필 부분 수정 (이름만 변경)
+PUT http://localhost:8080/api/user-profiles/2
+Content-Type: application/json
+
+{
+  "name": "이학생님"
+}
+
+###
+
+### 사용자 프로필 부분 수정 (전화번호만 변경)
+PUT http://localhost:8080/api/user-profiles/3
+Content-Type: application/json
+
+{
+  "phone": "010-9876-5432"
+}
+
+###
+
+### 사용자 프로필 수정 (잘못된 전화번호 형식)
+PUT http://localhost:8080/api/user-profiles/1
+Content-Type: application/json
+
+{
+  "phone": "010-123-4567"
+}
+
+###
+
+### 존재하지 않는 사용자 프로필 수정
+PUT http://localhost:8080/api/user-profiles/999
+Content-Type: application/json
+
+{
+  "name": "존재하지 않는 사용자"
+}
