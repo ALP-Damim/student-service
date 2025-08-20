@@ -18,6 +18,9 @@ set PGADMIN_PORT=5050
 REM 애플리케이션 설정
 set APP_PORT=8080
 
+REM docker 설정
+set DOCKER_USERNAME=YOUR_NICKNAME
+
 echo 환경변수 설정이 완료되었습니다.
 echo.
 echo 설정된 환경변수:
