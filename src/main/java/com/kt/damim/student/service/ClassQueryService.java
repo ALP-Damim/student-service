@@ -81,6 +81,16 @@ public class ClassQueryService {
 		return classes.stream().map(this::toDto).collect(Collectors.toList());
 	}
 
+	// 여러 강좌를 ID로 한번에 조회
+	public List<ClassResponseDto> getClassesByIds(List<Integer> classIds) {
+		if (classIds == null || classIds.isEmpty()) {
+			return List.of();
+		}
+		
+		List<Class> classes = classRepository.findAllById(classIds);
+		return classes.stream().map(this::toDto).collect(Collectors.toList());
+	}
+
 	private ClassResponseDto toDto(Class c) {
 		return ClassResponseDto.builder()
 				.classId(c.getClassId())

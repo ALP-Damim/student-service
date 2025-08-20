@@ -347,7 +347,58 @@ curl -X GET "http://localhost:8080/api/classes?teacherId=1&semesterOrder=desc&da
 - `teacherId`가 지정되지 않으면 모든 교사의 강좌를 반환합니다
 - 교사 ID는 `classes` 테이블의 `teacher_id` 컬럼과 매칭됩니다
 
-### 3. 클래스별 출석 통계 조회
+### 3. 여러 강좌 한번에 조회
+
+**엔드포인트**: `POST /api/classes/batch`
+
+**설명**: 여러 강좌를 ID 목록으로 한번에 조회합니다.
+
+**요청 본문**:
+```json
+[1, 2, 3]
+```
+
+**요청 필드**:
+- 강좌 ID 배열 (Integer[]): 조회할 강좌들의 ID 목록
+
+**요청 예시**:
+```bash
+curl -X POST "http://localhost:8080/api/classes/batch" \
+  -H "Content-Type: application/json" \
+  -d '[1, 2, 3]'
+```
+
+**응답 예시**:
+```json
+[
+  {
+    "classId": 1,
+    "teacherId": 101,
+    "teacherName": "김교수",
+    "className": "자바프로그래밍",
+    "semester": "2024-1",
+    "zoomUrl": "https://zoom.us/j/123456789",
+    "heldDay": 7,
+    "heldDaysString": "월, 화, 수",
+    "startsAt": "10:00:00",
+    "endsAt": "12:00:00"
+  },
+  {
+    "classId": 2,
+    "teacherId": 102,
+    "teacherName": "이교수",
+    "className": "데이터베이스",
+    "semester": "2024-1",
+    "zoomUrl": "https://zoom.us/j/987654321",
+    "heldDay": 24,
+    "heldDaysString": "목, 금",
+    "startsAt": "14:00:00",
+    "endsAt": "16:00:00"
+  }
+]
+```
+
+### 4. 클래스별 출석 통계 조회
 
 **엔드포인트**: `GET /api/attendance/class/{studentId}/{classId}`
 
@@ -390,7 +441,7 @@ curl -X GET "http://localhost:8080/api/attendance/class/1/1"
 }
 ```
 
-### 4. 세션별 출석 조회
+### 5. 세션별 출석 조회
 
 **엔드포인트**: `GET /api/attendance/session/{studentId}/{sessionId}`
 
@@ -420,7 +471,7 @@ curl -X GET "http://localhost:8080/api/attendance/session/1/1"
 }
 ```
 
-### 5. 사용자 정보 조회
+### 6. 사용자 정보 조회
 
 **엔드포인트**: `GET /api/users/{userId}`
 
@@ -450,7 +501,7 @@ curl -X GET "http://localhost:8080/api/users/1"
 - `STUDENT`: 학생
 - `TEACHER`: 교사
 
-### 5. 사용자 프로필 조회
+### 7. 사용자 프로필 조회
 
 **엔드포인트**: `GET /api/user-profiles/{userId}`
 
@@ -487,7 +538,7 @@ curl -X GET "http://localhost:8080/api/user-profiles/1"
 - `school`: 소속 학교
 - `phone`: 전화번호
 
-### 6. 사용자 프로필 수정
+### 8. 사용자 프로필 수정
 
 **엔드포인트**: `PUT /api/user-profiles/{userId}`
 
@@ -562,6 +613,115 @@ curl -X PUT "http://localhost:8080/api/user-profiles/1" \
 ```json
 {
   "message": "전화번호는 010-XXXX-XXXX 형식이어야 합니다."
+}
+```
+
+### 9. 수강 신청 관리
+
+#### 7.1 강좌 신청
+
+**엔드포인트**: `POST /api/enrollments`
+
+**설명**: 학생이 강좌에 수강 신청합니다.
+
+**요청 본문**:
+```json
+{
+  "studentId": 2,
+  "classId": 1
+}
+```
+
+**요청 필드**:
+- `studentId` (Integer, required): 신청할 학생의 ID
+- `classId` (Integer, required): 신청할 강좌의 ID
+
+**요청 예시**:
+```bash
+curl -X POST "http://localhost:8080/api/enrollments" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "studentId": 2,
+    "classId": 1
+  }'
+```
+
+**응답 예시** (201 Created):
+```json
+{
+  "studentId": 2,
+  "classId": 1,
+  "status": "ENROLLED",
+  "createdAt": "2024-01-20T15:30:00Z"
+}
+```
+
+#### 7.2 수강 신청 목록 조회
+
+**엔드포인트**: `GET /api/enrollments`
+
+**설명**: 수강 신청 목록을 조회합니다. 다양한 조건으로 필터링 가능합니다.
+
+**쿼리 파라미터**:
+- `studentId` (옵션): 특정 학생의 수강 신청만 조회
+- `classId` (옵션): 특정 강좌의 수강 신청만 조회
+- `status` (옵션): 특정 상태의 수강 신청만 조회 (예: ENROLLED, CANCELLED)
+
+**요청 예시**:
+```bash
+# 전체 수강 신청 조회
+curl -X GET "http://localhost:8080/api/enrollments"
+
+# 특정 학생의 수강 신청 조회
+curl -X GET "http://localhost:8080/api/enrollments?studentId=2"
+
+# 특정 강좌의 수강 신청 조회
+curl -X GET "http://localhost:8080/api/enrollments?classId=1"
+
+# 특정 상태의 수강 신청 조회
+curl -X GET "http://localhost:8080/api/enrollments?status=ENROLLED"
+
+# 복합 조건 조회
+curl -X GET "http://localhost:8080/api/enrollments?studentId=2&status=ENROLLED"
+```
+
+
+
+
+
+**검증 규칙**:
+- 학생 ID와 강좌 ID는 필수이며 양수여야 합니다
+- 신청하는 사용자는 반드시 학생(STUDENT) 역할이어야 합니다
+- 존재하지 않는 학생이나 강좌는 신청할 수 없습니다
+- 이미 수강 중인 강좌는 중복 신청할 수 없습니다
+
+**에러 응답 예시들**:
+
+**존재하지 않는 학생** (400 Bad Request):
+```json
+{
+  "message": "학생을 찾을 수 없습니다: 999"
+}
+```
+
+**존재하지 않는 강좌** (400 Bad Request):
+```json
+{
+  "message": "강좌를 찾을 수 없습니다: 999"
+}
+```
+
+**교사가 신청 시도** (400 Bad Request):
+```json
+{
+  "message": "학생이 아닌 사용자는 강좌를 신청할 수 없습니다: 1"
+}
+```
+
+**중복 신청** (400 Bad Request):
+```json
+{
+  "message": "이미 수강 중인 강좌입니다: 학생 ID 2, 강좌 ID 1"
 }
 ```
 
