@@ -50,7 +50,7 @@ public class EnrollmentService {
                 .studentId(requestDto.getStudentId())
                 .classId(requestDto.getClassId())
                 .status("ENROLLED")
-                .createdAt(java.time.OffsetDateTime.now(java.time.ZoneOffset.ofHours(9)))
+                .createdAt(java.time.OffsetDateTime.now())
                 .build();
 
         Enrollment savedEnrollment = enrollmentRepository.save(enrollment);

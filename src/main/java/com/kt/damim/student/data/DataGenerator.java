@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -163,7 +162,7 @@ public class DataGenerator implements CommandLineRunner {
                     .passwordHash("hashed_password_teacher_" + (i + 1))
                     .role(User.UserRole.TEACHER)
                     .isActive(true)
-                    .createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+                    .createdAt(OffsetDateTime.now())
                     .build();
             
             teachers.add(userRepository.save(teacher));
@@ -181,7 +180,7 @@ public class DataGenerator implements CommandLineRunner {
                     .passwordHash("hashed_password_student_" + (i + 1))
                     .role(User.UserRole.STUDENT)
                     .isActive(true)
-                    .createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+                    .createdAt(OffsetDateTime.now())
                     .build();
             
             students.add(userRepository.save(student));
@@ -203,7 +202,7 @@ public class DataGenerator implements CommandLineRunner {
                     .birthDate(generateRandomBirthDate(30, 60)) // 교사는 30-60세
                     .school(SCHOOLS[random.nextInt(SCHOOLS.length)])
                     .phone("010-" + String.format("%04d", random.nextInt(10000)) + "-" + String.format("%04d", random.nextInt(10000)))
-                    .createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+                    .createdAt(OffsetDateTime.now())
                     .build();
             
             userProfileRepository.save(profile);
@@ -223,7 +222,7 @@ public class DataGenerator implements CommandLineRunner {
                     .birthDate(generateRandomBirthDate(18, 25)) // 학생은 18-25세
                     .school(SCHOOLS[random.nextInt(SCHOOLS.length)])
                     .phone("010-" + String.format("%04d", random.nextInt(10000)) + "-" + String.format("%04d", random.nextInt(10000)))
-                    .createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+                    .createdAt(OffsetDateTime.now())
                     .build();
             
             userProfileRepository.save(profile);
@@ -231,7 +230,7 @@ public class DataGenerator implements CommandLineRunner {
     }
     
     private LocalDate generateRandomBirthDate(int minAge, int maxAge) {
-        int currentYear = OffsetDateTime.now(ZoneOffset.ofHours(9)).getYear();
+        int currentYear = OffsetDateTime.now().getYear();
         int birthYear = currentYear - minAge - random.nextInt(maxAge - minAge + 1);
         int birthMonth = 1 + random.nextInt(12);
         int birthDay = 1 + random.nextInt(28); // 간단히 28일로 제한
@@ -271,7 +270,7 @@ public class DataGenerator implements CommandLineRunner {
                         .startsAt(schedule.startTime)
                         .endsAt(schedule.endTime)
                         .capacity(20 + random.nextInt(31)) // 20-50명
-                        .createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+                        .createdAt(OffsetDateTime.now())
                         .build();
                 
                 Class savedClass = classRepository.save(classEntity);
@@ -350,7 +349,7 @@ public class DataGenerator implements CommandLineRunner {
     
     private List<Session> generateSessions(List<Class> classes) {
         List<Session> sessions = new ArrayList<>();
-        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.ofHours(9));
+        OffsetDateTime now = OffsetDateTime.now();
         
         for (Class classEntity : classes) {
             // 강의 요일과 시간 정보 가져오기
@@ -486,7 +485,7 @@ public class DataGenerator implements CommandLineRunner {
                         .studentId(student.getUserId())
                         .classId(selectedClass.getClassId())
                         .status("ENROLLED")
-                        .createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+                        .createdAt(OffsetDateTime.now())
                         .build();
                 
                 enrollments.add(enrollmentRepository.save(enrollment));
@@ -538,7 +537,7 @@ public class DataGenerator implements CommandLineRunner {
     
     private int generateAttendances(List<User> students, List<Session> sessions) {
         int attendanceCount = 0;
-        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.ofHours(9));
+        OffsetDateTime now = OffsetDateTime.now();
         
         for (User student : students) {
             // 학생이 수강하는 클래스의 세션들만 필터링

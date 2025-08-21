@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
@@ -47,7 +46,7 @@ public class DataInitializer implements CommandLineRunner {
 				.passwordHash("hashed_password_1")
 				.role(User.UserRole.STUDENT)
 				.isActive(true)
-				.createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+				.createdAt(OffsetDateTime.now())
 				.build();
 		student1 = userRepository.save(student1);
 		
@@ -56,7 +55,7 @@ public class DataInitializer implements CommandLineRunner {
 				.passwordHash("hashed_password_2")
 				.role(User.UserRole.STUDENT)
 				.isActive(true)
-				.createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+				.createdAt(OffsetDateTime.now())
 				.build();
 		student2 = userRepository.save(student2);
 		
@@ -66,7 +65,7 @@ public class DataInitializer implements CommandLineRunner {
 				.passwordHash("hashed_password_teacher")
 				.role(User.UserRole.TEACHER)
 				.isActive(true)
-				.createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+				.createdAt(OffsetDateTime.now())
 				.build();
 		teacher1 = userRepository.save(teacher1);
 		
@@ -81,7 +80,7 @@ public class DataInitializer implements CommandLineRunner {
 				.startsAt(LocalTime.of(10, 0)) // 10:00
 				.endsAt(LocalTime.of(12, 0)) // 12:00
 				.capacity(30)
-				.createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+				.createdAt(OffsetDateTime.now())
 				.build();
 		class1 = classRepository.save(class1);
 		
@@ -95,7 +94,7 @@ public class DataInitializer implements CommandLineRunner {
 				.startsAt(LocalTime.of(14, 0)) // 14:00
 				.endsAt(LocalTime.of(16, 0)) // 16:00
 				.capacity(25)
-				.createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+				.createdAt(OffsetDateTime.now())
 				.build();
 		class2 = classRepository.save(class2);
 		
@@ -103,21 +102,21 @@ public class DataInitializer implements CommandLineRunner {
 		Session session1 = Session.builder()
 				.classId(class1.getClassId())
 				.sessionName("session1")
-				.onDate(OffsetDateTime.now(ZoneOffset.ofHours(9)).minusDays(7))
+				.onDate(OffsetDateTime.now().minusDays(7))
 				.build();
 		session1 = sessionRepository.save(session1);
 		
 		Session session2 = Session.builder()
 				.classId(class1.getClassId())
 				.sessionName("session2")
-				.onDate(OffsetDateTime.now(ZoneOffset.ofHours(9)).minusDays(5))
+				.onDate(OffsetDateTime.now().minusDays(5))
 				.build();
 		session2 = sessionRepository.save(session2);
 		
 		Session session3 = Session.builder()
 				.classId(class2.getClassId())
 				.sessionName("session3")
-				.onDate(OffsetDateTime.now(ZoneOffset.ofHours(9)).minusDays(3))
+				.onDate(OffsetDateTime.now().minusDays(3))
 				.build();
 		session3 = sessionRepository.save(session3);
 		
@@ -127,7 +126,7 @@ public class DataInitializer implements CommandLineRunner {
 				.studentId(student1.getUserId())
 				.status(Attendance.AttendanceStatus.PRESENT)
 				.note("좋은 수업이었습니다")
-				.createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+				.createdAt(OffsetDateTime.now())
 				.build();
 		attendanceRepository.save(attendance1);
 		
@@ -136,7 +135,7 @@ public class DataInitializer implements CommandLineRunner {
 				.studentId(student1.getUserId())
 				.status(Attendance.AttendanceStatus.LATE)
 				.note("지각했습니다")
-				.createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+				.createdAt(OffsetDateTime.now())
 				.build();
 		attendanceRepository.save(attendance2);
 		
@@ -145,7 +144,7 @@ public class DataInitializer implements CommandLineRunner {
 				.studentId(student1.getUserId())
 				.status(Attendance.AttendanceStatus.PRESENT)
 				.note("훌륭한 수업")
-				.createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+				.createdAt(OffsetDateTime.now())
 				.build();
 		attendanceRepository.save(attendance3);
 		
@@ -154,7 +153,7 @@ public class DataInitializer implements CommandLineRunner {
 				.studentId(student2.getUserId())
 				.status(Attendance.AttendanceStatus.PRESENT)
 				.note("매우 만족")
-				.createdAt(OffsetDateTime.now(ZoneOffset.ofHours(9)))
+				.createdAt(OffsetDateTime.now())
 				.build();
 		attendanceRepository.save(attendance4);
 		
