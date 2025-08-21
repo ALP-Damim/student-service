@@ -101,7 +101,7 @@ docker-compose -f docker-compose.localdb.yml up -d
 
 **엔드포인트**: `POST /api/classes`
 
-**설명**: 새로운 강좌를 등록합니다.
+**설명**: 새로운 강좌를 등록합니다. 강좌 생성 시 자동으로 앞으로 10개의 수업 세션이 생성됩니다.
 
 **요청 본문**:
 ```json
@@ -134,6 +134,44 @@ docker-compose -f docker-compose.localdb.yml up -d
 - `subject`: 과목명 (String, 예: "자바프로그래밍", "데이터베이스")
 - `zoomUrl`: 줌 URL (String)
 - `capacity`: 수용 인원 (Integer)
+
+**응답 예시**:
+```json
+{
+  "classId": 1,
+  "teacherId": 1,
+  "teacherName": "김교수",
+  "className": "자바 프로그래밍",
+  "semester": "2024-2",
+  "schoolYear": "2024",
+  "subject": "자바프로그래밍",
+  "zoomUrl": "https://zoom.us/j/123456789",
+  "heldDay": 7,
+  "heldDaysString": "월, 화, 수",
+  "startsAt": "10:00:00",
+  "endsAt": "12:00:00",
+  "capacity": 30,
+  "generatedSessions": [
+    {
+      "sessionId": 1,
+      "sessionName": "세션 1",
+      "onDate": "2024-12-02T10:00:00+09:00"
+    },
+    {
+      "sessionId": 2,
+      "sessionName": "세션 2",
+      "onDate": "2024-12-03T10:00:00+09:00"
+    }
+  ]
+}
+```
+
+**자동 세션 생성 규칙**:
+- 강좌 생성 시 자동으로 앞으로 10개의 수업 세션이 생성됩니다
+- 요일 비트마스크를 기반으로 해당 요일들에만 세션을 생성합니다
+- 현재 날짜부터 시작하여 해당 요일을 만날 때마다 세션을 생성합니다
+- 세션 이름은 "세션 1", "세션 2" 형태로 자동 생성됩니다
+- 세션 시간은 강좌의 시작 시간을 기준으로 설정됩니다
 
 **요일 비트마스크 설명**:
 - 월: 1, 화: 2, 수: 4, 목: 8, 금: 16, 토: 32, 일: 64

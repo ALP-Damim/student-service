@@ -99,7 +99,7 @@ Content-Type: application/json
 
 [1, 2, 3]
 
-### 강좌 등록 (새로운 필드 포함 - 선택사항)
+### 강좌 등록 (새로운 필드 포함 - 자동 세션 생성 테스트)
 POST http://localhost:8080/api/classes
 Content-Type: application/json
 
@@ -115,6 +115,42 @@ Content-Type: application/json
   "startsAt": "13:00:00",
   "endsAt": "15:00:00",
   "capacity": 15
+}
+
+### 강좌 등록 (월화수 수업 - 자동 세션 생성 테스트)
+POST http://localhost:8080/api/classes
+Content-Type: application/json
+
+{
+  "teacherId": 5,
+  "teacherName": "정교수",
+  "className": "알고리즘",
+  "semester": "2024-2",
+  "schoolYear": "2024",
+  "subject": "알고리즘",
+  "zoomUrl": "https://zoom.us/j/444555666",
+  "heldDay": 7,
+  "startsAt": "16:00:00",
+  "endsAt": "18:00:00",
+  "capacity": 20
+}
+
+### 강좌 등록 (금요일 수업 - 자동 세션 생성 테스트)
+POST http://localhost:8080/api/classes
+Content-Type: application/json
+
+{
+  "teacherId": 6,
+  "teacherName": "한교수",
+  "className": "데이터 구조",
+  "semester": "2024-2",
+  "schoolYear": "2024",
+  "subject": "데이터구조",
+  "zoomUrl": "https://zoom.us/j/777888999",
+  "heldDay": 16,
+  "startsAt": "09:00:00",
+  "endsAt": "11:00:00",
+  "capacity": 25
 }
 
 ## 2. 출석 관리 API
@@ -356,3 +392,12 @@ Content-Type: application/json
 
 ### 강좌별 세션 목록 조회
 GET http://localhost:8080/api/sessions/classes/1
+
+### 새로 생성된 강좌의 세션 목록 조회 (위에서 생성한 강좌 ID 사용)
+GET http://localhost:8080/api/sessions/classes/4
+
+### 월화수 수업 세션 목록 조회
+GET http://localhost:8080/api/sessions/classes/5
+
+### 금요일 수업 세션 목록 조회
+GET http://localhost:8080/api/sessions/classes/6

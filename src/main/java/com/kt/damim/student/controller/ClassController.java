@@ -1,6 +1,7 @@
 package com.kt.damim.student.controller;
 
 import com.kt.damim.student.dto.ClassCreateRequestDto;
+import com.kt.damim.student.dto.ClassCreateResponseDto;
 import com.kt.damim.student.dto.ClassResponseDto;
 import com.kt.damim.student.service.ClassQueryService;
 import com.kt.damim.student.service.ClassService;
@@ -34,8 +35,8 @@ public class ClassController {
 	}
 
 	@PostMapping
-	public ResponseEntity<ClassResponseDto> createClass(@RequestBody ClassCreateRequestDto requestDto) {
-		ClassResponseDto createdClass = classService.createClass(requestDto);
+	public ResponseEntity<ClassCreateResponseDto> createClass(@RequestBody ClassCreateRequestDto requestDto) {
+		ClassCreateResponseDto createdClass = classService.createClass(requestDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdClass);
 	}
 
