@@ -32,8 +32,8 @@ public class SessionGenerationService {
     public List<Session> generateSessionsForClass(Class classEntity) {
         List<Session> sessions = new ArrayList<>();
         
-        // 현재 날짜부터 시작
-        LocalDate currentDate = LocalDate.now();
+        // 현재 날짜부터 시작 (한국 시간 기준)
+        LocalDate currentDate = LocalDate.now(ZoneOffset.ofHours(9));
         LocalTime startTime = classEntity.getStartsAt();
         LocalTime endTime = classEntity.getEndsAt();
         
