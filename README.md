@@ -110,7 +110,7 @@ docker-compose -f docker-compose.localdb.yml up -d
   "teacherName": "김교수",
   "className": "자바 프로그래밍",
   "semester": "2024-2",
-  "schoolYear": "2024",
+  "schoolYear": 3,
   "subject": "자바프로그래밍",
   "zoomUrl": "https://zoom.us/j/123456789",
   "heldDay": 7,
@@ -130,7 +130,7 @@ docker-compose -f docker-compose.localdb.yml up -d
 - `endsAt`: 종료 시간 (HH:MM:SS 형식)
 
 **선택 필드**:
-- `schoolYear`: 학년도 (String, 예: "2024", "2025")
+- `schoolYear`: 학년 (Integer, 예: 1, 2, 3, 4, 5, 6)
 - `subject`: 과목명 (String, 예: "자바프로그래밍", "데이터베이스")
 - `zoomUrl`: 줌 URL (String)
 - `capacity`: 수용 인원 (Integer)
@@ -143,7 +143,7 @@ docker-compose -f docker-compose.localdb.yml up -d
   "teacherName": "김교수",
   "className": "자바 프로그래밍",
   "semester": "2024-2",
-  "schoolYear": "2024",
+  "schoolYear": 3,
   "subject": "자바프로그래밍",
   "zoomUrl": "https://zoom.us/j/123456789",
   "heldDay": 7,

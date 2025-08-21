@@ -265,6 +265,8 @@ public class DataGenerator implements CommandLineRunner {
                         .teacherName(TEACHER_NAMES[teachers.indexOf(teacher) % TEACHER_NAMES.length])
                         .className(subject)
                         .semester(semester)
+                        .schoolYear(1 + random.nextInt(6)) // 1~6학년
+                        .subject(subject)
                         .zoomUrl("https://zoom.us/j/" + (100000000 + random.nextInt(900000000)))
                         .heldDay(schedule.dayPattern)
                         .startsAt(schedule.startTime)

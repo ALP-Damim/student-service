@@ -75,6 +75,8 @@ public class DataInitializer implements CommandLineRunner {
 				.teacherName("김교수")
 				.className("자바프로그래밍")
 				.semester("2024-1")
+				.schoolYear(3)
+				.subject("자바프로그래밍")
 				.zoomUrl("https://zoom.us/j/123456789")
 				.heldDay(7) // 월화수 (1+2+4)
 				.startsAt(LocalTime.of(10, 0)) // 10:00
@@ -89,6 +91,8 @@ public class DataInitializer implements CommandLineRunner {
 				.teacherName("김교수")
 				.className("데이터베이스")
 				.semester("2024-1")
+				.schoolYear(4)
+				.subject("데이터베이스")
 				.zoomUrl("https://zoom.us/j/987654321")
 				.heldDay(24) // 목금 (8+16)
 				.startsAt(LocalTime.of(14, 0)) // 14:00

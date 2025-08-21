@@ -18,7 +18,7 @@ public class ClassCreateRequestDto {
     private String teacherName;
     private String className;
     private String semester;
-    private String schoolYear;
+    private Integer schoolYear;
     private String subject;
     private String zoomUrl;
     private Integer heldDay;

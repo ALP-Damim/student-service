@@ -39,7 +39,7 @@ public class Class {
     private String semester;
     
     @Column(name = "school_year")
-    private String schoolYear;
+    private Integer schoolYear;
     
     @Column(name = "subject")
     private String subject;
