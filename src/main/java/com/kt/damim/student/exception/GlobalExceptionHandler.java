@@ -12,6 +12,17 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
+    @ExceptionHandler(AttendanceException.class)
+    public ResponseEntity<Map<String, Object>> handleAttendanceException(AttendanceException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", HttpStatus.BAD_REQUEST.value());
+        errorResponse.put("error", "Attendance Error");
+        errorResponse.put("message", ex.getMessage());
+        
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+    
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
         Map<String, Object> errorResponse = new HashMap<>();

@@ -101,6 +101,83 @@ GET http://localhost:8080/api/attendance/class/1/1
 ### 세션별 출석 조회
 GET http://localhost:8080/api/attendance/session/1/1
 
+### 출석 기록 생성
+POST http://localhost:8080/api/attendance
+Content-Type: application/json
+
+{
+  "sessionId": 1,
+  "studentId": 2,
+  "status": "PRESENT",
+  "note": "정상 출석"
+}
+
+### 출석 기록 생성 (지각)
+POST http://localhost:8080/api/attendance
+Content-Type: application/json
+
+{
+  "sessionId": 1,
+  "studentId": 3,
+  "status": "LATE",
+  "note": "10분 지각"
+}
+
+### 출석 기록 생성 (결석)
+POST http://localhost:8080/api/attendance
+Content-Type: application/json
+
+{
+  "sessionId": 2,
+  "studentId": 2,
+  "status": "ABSENT",
+  "note": "개인 사정으로 결석"
+}
+
+### 출석 기록 생성 (사유 결석)
+POST http://localhost:8080/api/attendance
+Content-Type: application/json
+
+{
+  "sessionId": 2,
+  "studentId": 3,
+  "status": "EXCUSED",
+  "note": "병가로 인한 사유 결석"
+}
+
+### 출석 기록 생성 (중복 시도 - 에러)
+POST http://localhost:8080/api/attendance
+Content-Type: application/json
+
+{
+  "sessionId": 1,
+  "studentId": 2,
+  "status": "PRESENT",
+  "note": "중복 출석 기록"
+}
+
+### 출석 기록 생성 (존재하지 않는 학생 - 에러)
+POST http://localhost:8080/api/attendance
+Content-Type: application/json
+
+{
+  "sessionId": 1,
+  "studentId": 999,
+  "status": "PRESENT",
+  "note": "존재하지 않는 학생"
+}
+
+### 출석 기록 생성 (존재하지 않는 세션 - 에러)
+POST http://localhost:8080/api/attendance
+Content-Type: application/json
+
+{
+  "sessionId": 999,
+  "studentId": 2,
+  "status": "PRESENT",
+  "note": "존재하지 않는 세션"
+}
+
 ## 3. 사용자 관리 API
 
 ### 사용자 정보 조회

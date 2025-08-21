@@ -1,5 +1,7 @@
 package com.kt.damim.student.controller;
 
+import com.kt.damim.student.dto.AttendanceCreateRequestDto;
+import com.kt.damim.student.dto.AttendanceCreateResponseDto;
 import com.kt.damim.student.dto.ClassAttendanceResponseDto;
 import com.kt.damim.student.dto.SessionAttendanceResponseDto;
 import com.kt.damim.student.service.AttendanceService;
@@ -30,5 +32,13 @@ public class AttendanceController {
         
         SessionAttendanceResponseDto response = attendanceService.getSessionAttendance(studentId, sessionId);
         return ResponseEntity.ok(response);
+    }
+    
+    @PostMapping
+    public ResponseEntity<AttendanceCreateResponseDto> createAttendance(
+            @RequestBody AttendanceCreateRequestDto request) {
+        
+        AttendanceCreateResponseDto response = attendanceService.createAttendance(request);
+        return ResponseEntity.status(201).body(response);
     }
 }

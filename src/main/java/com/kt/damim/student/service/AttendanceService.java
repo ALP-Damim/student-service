@@ -1,5 +1,7 @@
 package com.kt.damim.student.service;
 
+import com.kt.damim.student.dto.AttendanceCreateRequestDto;
+import com.kt.damim.student.dto.AttendanceCreateResponseDto;
 import com.kt.damim.student.dto.AttendanceResultDto;
 import com.kt.damim.student.dto.ClassAttendanceResponseDto;
 import com.kt.damim.student.dto.SessionAttendanceResponseDto;
@@ -7,6 +9,7 @@ import com.kt.damim.student.entity.Attendance;
 import com.kt.damim.student.entity.Class;
 import com.kt.damim.student.entity.Session;
 import com.kt.damim.student.entity.User;
+import com.kt.damim.student.exception.AttendanceException;
 import com.kt.damim.student.repository.AttendanceRepository;
 import com.kt.damim.student.repository.ClassRepository;
 import com.kt.damim.student.repository.SessionRepository;
@@ -122,5 +125,33 @@ public class AttendanceService {
         }
         
         return response;
+    }
+    
+    public AttendanceCreateResponseDto createAttendance(AttendanceCreateRequestDto request) {
+        // 학생 존재 확인
+        User student = userRepository.findById(request.getStudentId())
+                .orElseThrow(() -> new AttendanceException("학생을 찾을 수 없습니다: " + request.getStudentId()));
+        
+        // 세션 존재 확인
+        Session session = sessionRepository.findById(request.getSessionId())
+                .orElseThrow(() -> new AttendanceException("세션을 찾을 수 없습니다: " + request.getSessionId()));
+        
+        // 이미 출석 기록이 있는지 확인
+        Attendance.AttendanceId attendanceId = new Attendance.AttendanceId(request.getSessionId(), request.getStudentId());
+        if (attendanceRepository.existsById(attendanceId)) {
+            throw new AttendanceException("이미 출석 기록이 존재합니다: sessionId=" + request.getSessionId() + ", studentId=" + request.getStudentId());
+        }
+        
+        // 출석 기록 생성
+        Attendance attendance = Attendance.builder()
+                .sessionId(request.getSessionId())
+                .studentId(request.getStudentId())
+                .status(request.getStatus())
+                .note(request.getNote())
+                .build();
+        
+        Attendance savedAttendance = attendanceRepository.save(attendance);
+        
+        return AttendanceCreateResponseDto.from(savedAttendance);
     }
 }
