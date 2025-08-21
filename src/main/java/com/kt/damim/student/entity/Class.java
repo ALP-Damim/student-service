@@ -38,6 +38,12 @@ public class Class {
     @Column(nullable = false)
     private String semester;
     
+    @Column(name = "school_year")
+    private String schoolYear;
+    
+    @Column(name = "subject")
+    private String subject;
+    
     @Column(name = "zoom_url")
     private String zoomUrl;
     

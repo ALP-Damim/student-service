@@ -35,7 +35,10 @@
    - class_id (PK, Auto Increment)
    - teacher_id (FK to users)
    - teacher_name (TEXT, NOT NULL)
+   - className (TEXT, NOT NULL)
    - semester (TEXT, NOT NULL)
+   - school_year (TEXT) - 학년도 (예: 2024, 2025)
+   - subject (TEXT) - 과목명 (예: 자바프로그래밍, 데이터베이스)
    - zoom_url (TEXT)
    - held_day (INTEGER) - 비트셋으로 요일 표시 (월:1, 화:2, 수:4, 목:8, 금:16, 토:32, 일:64)
    - starts_at (TIME) - HH:MM 형식
@@ -107,6 +110,8 @@ docker-compose -f docker-compose.localdb.yml up -d
   "teacherName": "김교수",
   "className": "자바 프로그래밍",
   "semester": "2024-2",
+  "schoolYear": "2024",
+  "subject": "자바프로그래밍",
   "zoomUrl": "https://zoom.us/j/123456789",
   "heldDay": 7,
   "startsAt": "10:00:00",
@@ -125,6 +130,8 @@ docker-compose -f docker-compose.localdb.yml up -d
 - `endsAt`: 종료 시간 (HH:MM:SS 형식)
 
 **선택 필드**:
+- `schoolYear`: 학년도 (String, 예: "2024", "2025")
+- `subject`: 과목명 (String, 예: "자바프로그래밍", "데이터베이스")
 - `zoomUrl`: 줌 URL (String)
 - `capacity`: 수용 인원 (Integer)
 

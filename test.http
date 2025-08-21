@@ -48,6 +48,8 @@ Content-Type: application/json
   "teacherName": "김교수",
   "className": "자바 프로그래밍",
   "semester": "2024-2",
+  "schoolYear": "2024",
+  "subject": "자바프로그래밍",
   "zoomUrl": "https://zoom.us/j/123456789",
   "heldDay": 7,
   "startsAt": "10:00:00",
@@ -64,6 +66,8 @@ Content-Type: application/json
   "teacherName": "이교수",
   "className": "데이터베이스 설계",
   "semester": "2024-2",
+  "schoolYear": "2024",
+  "subject": "데이터베이스",
   "zoomUrl": "https://zoom.us/j/987654321",
   "heldDay": 7,
   "startsAt": "14:00:00",
@@ -80,6 +84,8 @@ Content-Type: application/json
   "teacherName": "박교수",
   "className": "웹 개발 실습",
   "semester": "2024-2",
+  "schoolYear": "2024",
+  "subject": "웹개발",
   "zoomUrl": "https://zoom.us/j/555666777",
   "heldDay": 24,
   "startsAt": "09:00:00",
@@ -92,6 +98,24 @@ POST http://localhost:8080/api/classes/batch
 Content-Type: application/json
 
 [1, 2, 3]
+
+### 강좌 등록 (새로운 필드 포함 - 선택사항)
+POST http://localhost:8080/api/classes
+Content-Type: application/json
+
+{
+  "teacherId": 4,
+  "teacherName": "최교수",
+  "className": "스프링부트 실습",
+  "semester": "2024-2",
+  "schoolYear": "2024",
+  "subject": "스프링부트",
+  "zoomUrl": "https://zoom.us/j/111222333",
+  "heldDay": 16,
+  "startsAt": "13:00:00",
+  "endsAt": "15:00:00",
+  "capacity": 15
+}
 
 ## 2. 출석 관리 API
 

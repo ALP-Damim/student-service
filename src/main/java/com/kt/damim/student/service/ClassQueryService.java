@@ -98,6 +98,8 @@ public class ClassQueryService {
 				.teacherName(c.getTeacherName())
 				.className(c.getClassName())
 				.semester(c.getSemester())
+				.schoolYear(c.getSchoolYear())
+				.subject(c.getSubject())
 				.zoomUrl(c.getZoomUrl())
 				.heldDay(c.getHeldDay())
 				.heldDaysString(c.getHeldDaysString())
